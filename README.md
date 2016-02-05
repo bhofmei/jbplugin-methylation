@@ -5,8 +5,8 @@ this plugin is to be used with whole-genome bisulfite sequencing data. Unlike al
 
 ##Install
 
-For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:
-``git clone https://github.com/bhofmei/jbplugin-methylation.git``
+For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:  
+``git clone https://github.com/bhofmei/jbplugin-methylation.git MethylationPlugin``
 
 ##Activate
 Add this to jbrowse.conf:

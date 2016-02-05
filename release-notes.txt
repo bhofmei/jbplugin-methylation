@@ -1,0 +1,9 @@
+Release Notes for Methylation Plugin
+
+# Version 1.1.0 - Feb 5, 2016
+- Added allC_to_bigwig.py script to be able to convert allC files
+- Added menu option to be able to change the height of all methylation tracks at once
+
+# Version 1.0.0 - Jan 24, 2016
+- Initial release
+- Allows context-specific methylation data to be displayed in JBrowse

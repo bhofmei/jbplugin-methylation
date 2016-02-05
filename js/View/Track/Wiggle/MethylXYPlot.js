@@ -57,7 +57,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         this._getScalingStats( viewArgs, dojo.hitch(this, function( stats ) {
 
             //calculate the scaling if necessary
-            if( ! this.lastScaling || ! this.lastScaling.sameStats( stats ) ) {
+            if( ! this.lastScaling || ! this.lastScaling.sameStats( stats ) || this.trackHeightChanged ) {
 
                 var scaling = new Scale( this.config, stats );
 

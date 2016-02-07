@@ -52,3 +52,15 @@ Track specifications are very similar to those for XYPlots (see JBrowse tutorial
         "urlTemplate" : "path/to/bigwig_file.bw",
         "type" : "MethylationPlugin/View/Track/Wiggle/MethylXYPlot"
     }
+
+##Getting bedGraphToBigWig
+Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>
+Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>
+Older Linux/Linux server: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v287/
+
+- Choose the appropriate web page from above. There will be a long list of programs. 
+- Scroll down to find __bedGraphToBigWig__
+- Save this program to computer
+- In terminal, navigate to the directory with the program
+- Type `chmod u+x bedGraphToBigWig`
+- Move the program to the same directory as __allc_to_bigwig_pe.py__ or add to path in __.bashrc__ or __.bash_profile__

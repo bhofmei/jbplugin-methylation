@@ -1,31 +1,47 @@
-.search-dialog .header {
-    font-weight: bold;
+/* hide CG button */
+span[widgetid=hidecg-btn] {
+  position:relative;
+  top: -1px;
 }
+#hidecg-btn{
+  height: 17px;
+  width: 17px;
+  background-image: url("../img/cg_enabled.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+#hidecg-btn[hidden-cg] {
+  background-image: url("../img/cg_disabled.png");
+} 
 
-.search-dialog .checkboxdiv {
-    display:block;
+/* hide CHG button */
+span[widgetid=hidechg-btn] {
+  position:relative;
+  top: -1px;
 }
+#hidechg-btn{
+  height: 17px;
+  width: 17px;
+  background-image: url("../img/chg_enabled.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+#hidechg-btn[hidden-chg] {
+  background-image: url("../img/chg_disabled.png");
+} 
 
-.search-dialog .translateContainer {
-    display:inline;
+/* hide CHH button */
+span[widgetid=hidechh-btn] {
+  position:relative;
+  top: -1px;
 }
-.search-dialog .translateContainer > label {
-    margin-left: 0.4em;
+#hidechh-btn{
+  height: 17px;
+  width: 17px;
+  background-image: url("../img/chh_enabled.png");
+  background-repeat: no-repeat;
+  background-position: center center;
 }
-
-.search-dialog .intro {
-    width: 25em;
-    padding: 2em;
-}
-
-.search-dialog .section {
-    margin: 0.5em auto;
-    width: 25em;
-}
-
-.search-dialog .dijitTextBox {
-    width: 25em;
-}
-.search-dialog .dijitTextBox * {
-    font-size: 110%;
-}
+#hidechh-btn[hidden-chh] {
+  background-image: url("../img/chh_disabled.png");
+} 

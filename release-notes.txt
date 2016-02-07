@@ -1,5 +1,8 @@
 Release Notes for Methylation Plugin
 
+# Version 1.2.0 - Feb 7, 2016
+- Added toolbar buttons to turn on/off methylation contexts for all tracks
+
 # Version 1.1.0 - Feb 5, 2016
 - Added allC_to_bigwig.py script to be able to convert allC files
 - Added menu option to be able to change the height of all methylation tracks at once

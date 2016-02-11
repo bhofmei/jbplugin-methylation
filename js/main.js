@@ -38,7 +38,6 @@ define('MethylationPlugin/main',[
     'dijit/MenuItem',
     "JBrowse/Browser",
     'JBrowse/View/Dialog/SetTrackHeight',
-      './Store/SeqFeature/MethylBigWig',
       './View/Track/Wiggle/MethylXYPlot'
        ],
        function(
@@ -58,7 +57,6 @@ define('MethylationPlugin/main',[
             dijitMenuItem,
             Browser,
             SetTrackHeightDialog,
-           BigWig,
            MethylXYPlot
        ){
  
@@ -67,7 +65,6 @@ return declare( JBrowsePlugin,
     constructor: function( args ) {
         
         // create the hide/show button after genome view initialization
-        
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;
         var browser = this.browser;

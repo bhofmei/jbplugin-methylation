@@ -38,8 +38,7 @@ define('MethylationPlugin/main',[
     'dijit/MenuItem',
     "JBrowse/Browser",
     'JBrowse/View/Dialog/SetTrackHeight',
-      './View/Track/Wiggle/MethylXYPlot',
-    './View/Track/Wiggle/MethylCovXYPlot'
+      './View/Track/Wiggle/MethylXYPlot'
        ],
        function(
            declare,
@@ -58,8 +57,7 @@ define('MethylationPlugin/main',[
             dijitMenuItem,
             Browser,
             SetTrackHeightDialog,
-           MethylXYPlot,
-            MethylCovXYPlot
+           MethylXYPlot
        ){
  
 return declare( JBrowsePlugin,

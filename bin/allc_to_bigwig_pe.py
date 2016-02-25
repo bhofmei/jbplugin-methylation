@@ -1,27 +1,41 @@
 import sys, math, glob, multiprocessing, subprocess, os
 
-# Usage: python3 allc_to_bigwig_pe.py [-keep] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+# Usage: python3 allc_to_bigwig_pe.py [-keep] [-no-clean] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
 
 # NOTE: allc file contains the methylation information for all chromosomes
 
 # Steps:
 # 1. allC to bedGraph
-# 1a. bedGraph for each methylation type
-# 2. bedGraph to BigWig
-# 3. remove temporary files
+# 2. sort bedGraph
+# 3. bedGraph to BigWig
+# 4. remove temporary files
 
 NUMPROC=1
 
-def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc ):
-	
+def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, needClean ):
+	if needClean:
+		chrmList = readChrmFile( chrmFileStr )
+	else:
+		chrmList = None
 	print( 'Begin processing files with {:d} processors'.format( numProc ) )
 	pool = multiprocessing.Pool( processes=numProc )
-	results = [ pool.apply_async( processFile, args=(allCFileAr[i], chrmFileStr, labelsAr[i], outID, keepTmp) ) for i in range(len(allCFileAr)) ]
+	results = [ pool.apply_async( processFile, args=(allCFileAr[i], chrmFileStr, chrmList, labelsAr[i], outID, keepTmp) ) for i in range(len(allCFileAr)) ]
 	suc = [ p.get() for p in results ]
 	
 	print( 'Done' )
 
-def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp ):
+def readChrmFile( inFileStr ):
+	inFile = open( inFileStr, 'r' )
+	chrmList= []
+	
+	for line in inFile:
+		lineAr = line.rstrip().split( '\t' )
+		# (0) chrm (1) length ...
+		chrmList += [ lineAr[0] ]
+	inFile.close()
+	return chrmList
+
+def processFile( allCFileStr, chrmFileStr, chrmList, label, outID, keepTmp ):
 	if outID == None and label == None:
 		outID = allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
 	elif outID == None:
@@ -34,7 +48,10 @@ def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp ):
 	print( 'Reading allC file {:s}'.format( allCFileStr ) )
 	# allC to bedGraph
 	bedGraphStr =  outID + '.bedGraph'
-	readAllC( allCFileStr, bedGraphStr )
+	readAllC( allCFileStr, bedGraphStr, chrmList )
+	
+	print( 'Sorting bedGraph file' )
+	sortBedFile( bedGraphStr )
 	
 	print( 'Converting {:s} file to BigWig'.format(bedGraphStr ) )
 	# bedGraph to bigWig
@@ -46,7 +63,7 @@ def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp ):
 		os.remove( bedGraphStr )
 	print( 'BigWig finished for {:s}.bw'.format( outID ) )
 
-def readAllC( allCFileStr, outFileStr ):
+def readAllC( allCFileStr, outFileStr, chrmList ):
 	
 	allCFile = open( allCFileStr, 'r' )
 	outFile = open( outFileStr, 'w' )
@@ -62,8 +79,11 @@ def readAllC( allCFileStr, outFileStr ):
 		# (6) methylated
 		if int( lineAr[6] ):
 			chrm = lineAr[0]
-			if chrm.isdigit():
-				chrm = 'Chr{:s}'.format(chrm)
+			name = formatChrmName( chrm )
+			if chrmList == None or name == False or name not in chrmList:
+				continue
+			else:
+				chrm = name
 			pos = int( lineAr[1] ) - 1
 			methType = decodeMethType( lineAr[3] )
 			try:
@@ -85,6 +105,31 @@ def readAllC( allCFileStr, outFileStr ):
 	allCFile.close()
 	outFile.close()
 
+def formatChrmName( inName ):
+	
+	chrm = inName.lower()
+	if chrm == 'c' or chrm == 'chloroplast' or chrm == 'chrc':
+		'ChrC'
+	elif chrm == 'm' or chrm == 'mitochondria' or chrm == 'chrm' or chrm == 'mt':
+		return 'ChrM'
+	elif chrm == 'l' or chrm == 'lambda' or chrm == 'chrl':
+		return 'ChrL'
+	# digit only number
+	elif chrm.isdigit():
+		return 'Chr'+chrm
+	elif chrm.startswith( 'chromosome' ):
+		return chrm.replace( 'chromosome', 'Chr' )
+	elif chrm.startswith( 'chrm' ):
+		return chrm.replace( 'chrm', 'Chr' )
+	elif chrm.startswith( 'chr' ):
+		return chrm.replace( 'chr', 'Chr' )
+	elif chrm.startswith( 'scaffold' ):
+		return chrm
+	elif chrm.startswith( 'contig' ):
+		return chrm
+	else:
+		return chrm
+
 def decodeMethType( mStr ):
 	
 	if mStr.startswith( 'CG' ):
@@ -96,6 +141,10 @@ def decodeMethType( mStr ):
 	else:
 		return 'CHH'
 
+def sortBedFile( bedFileStr ):
+	command = 'bedSort {:s} {:s}'.format( bedFileStr, bedFileStr )
+	subprocess.call( command, shell=True )
+
 def processBedGraph( bedGraphStr, chrmFileStr ):
 	
 	bigWigStr = bedGraphStr.replace( '.bedGraph', '.bw' )
@@ -106,17 +155,21 @@ def processBedGraph( bedGraphStr, chrmFileStr ):
 	
 
 def parseInputs( argv ):
-	# Usage: python3 allc_to_bigwig_pe.py [-keep] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+	# Usage: python3 allc_to_bigwig_pe.py [-keep] [-no-clean] [-L=labels] [-p=num_proc] [-o=out_id] <chrm_sizes>  <allC_file> [allC_file]*
 	
 	keepTmp = False
+	needClean = True
 	labelsAr = []
 	numProc = NUMPROC
 	outID = None
 	startInd = 0
 	
-	for i in range( min(4, len(argv)) ):
+	for i in range( min(7, len(argv)-2) ):
 		if argv[i] == '-keep':
 			keepTmp = True
+			startInd += 1
+		elif argv[i] == '-no-clean':
+			needClean = False
 			startInd += 1
 		elif argv[i].startswith( '-L=' ):
 			labelsAr = argv[i][3:].split( ',' )
@@ -131,6 +184,9 @@ def parseInputs( argv ):
 			except ValueError:
 				print( 'ERROR: number of processors must be an integer' )
 				exit()
+		elif argv[i] in [ '-h', '--help', '-help']:
+			printHelp()
+			exit()
 		elif argv[i].startswith( '-' ):
 			print( 'ERROR: {:s} is not a valid parameter'.format( argv[i] ) )
 			exit()
@@ -146,8 +202,11 @@ def parseInputs( argv ):
 		print( "ERROR: number of labels doesn't match number of allC files" )
 		exit()
 	
-	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc )
+	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, needClean )
 
+def printHelp():
+	print( '-no-clean\tdoes not check chromosome names match chrm file\n\t\tnot recommended\n' )
+	
 if __name__ == "__main__":
 	if len(sys.argv) < 3 :
 		print ("Usage: python3 allc_to_bigwig_pe.py [-keep] [-L=labels] [-o=outID] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*")

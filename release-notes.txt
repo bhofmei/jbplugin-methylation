@@ -1,5 +1,9 @@
 Release Notes for Methylation Plugin
 
+# Version 1.2.1 - Feb 25, 2016
+- Updated the methylation colors and buttons to be red-green color blind friendly
+- Updated allc_to_bigwig_pe.py script that renames chromosomes
+
 # Version 1.2.0 - Feb 7, 2016
 - Added toolbar buttons to turn on/off methylation contexts for all tracks
 

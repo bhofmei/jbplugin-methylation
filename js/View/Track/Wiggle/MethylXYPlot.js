@@ -7,7 +7,7 @@ define( 'MethylationPlugin/View/Track/Wiggle/MethylXYPlot', [
             'JBrowse/View/Track/WiggleBase',
             'JBrowse/View/Track/_YScaleMixin',
             'JBrowse/Util',
-            'JBrowse/View/Track/Wiggle/_Scale',
+            'JBrowse/View/Track/Wiggle/_Scale'
         ],
         function( declare, array, Color, domConstruct, on, WiggleBase, YScaleMixin, Util, Scale ) {
 
@@ -22,14 +22,14 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
  */
 {
     constructor: function() {
-        this.inherited(arguments); // call superclass constructor
+        //this.inherited(arguments); // call superclass constructor
 
         if (typeof(this.config.style.cg_color) == "undefined")
-        	this.config.style.cg_color = '#b03060';
+        	this.config.style.cg_color = '#A36085';
         if (typeof(this.config.style.chg_color) == "undefined")
-        	this.config.style.chg_color = '#2e8b57';
+        	this.config.style.chg_color = '#0072B2';
         if (typeof(this.config.style.chh_color) == "undefined")
-        	this.config.style.chh_color = '#1e90ff';
+        	this.config.style.chh_color = '#CF8F00';
         this.config.showCG = true;
         this.config.showCHG = true;
         this.config.showCHH = true;
@@ -40,13 +40,11 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         return Util.deepUpdate(
             dojo.clone( this.inherited(arguments) ),
             {
-                variance_band : false,
                 logScaleOption: false,
                 max_score: 1,
                 min_score: -1,
                 style: {
-                    origin_color: 'black',
-                    variance_band_color: 'gray',
+                    origin_color: 'black'
                 },
             }
         );
@@ -148,7 +146,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         var originY = toY( dataScale.origin );
         var disableClipMarkers = this.config.disable_clip_markers;
 
-        // sort features by score
         var fFeatures = [];
         dojo.forEach( features, function(f,i) {
             fFeatures.push({ feature: f, featureRect: featureRects[i] });
@@ -158,14 +155,14 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
             var f = pair.feature;
             var fRect = pair.featureRect;
             var tmpScore = f.get('score');
-            var score = this._calculateNewScore( tmpScore );
-            var id = this._getIdByScore( tmpScore );
+            var scoreID = this._getScoreInfo( tmpScore );
+            var score = scoreID[0];
+            var id = scoreID[1];
 
             fRect.t = toY( score );
             //console.log(fRect.t+','+canvasHeight);
             if( fRect.t <= canvasHeight && this._isShown(id) ) { // if the rectangle is visible at all
                 context.fillStyle = this._getFeatureColor(id);
-
                 if (fRect.t <= originY) // bar goes upward
                     context.fillRect( fRect.l, fRect.t, fRect.w, originY-fRect.t+1);
                 else // downward
@@ -184,47 +181,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         var toY = dojo.hitch( this, function( val ) {
            return canvasHeight * (1-dataScale.normalize.call(this, val));
         });
-
-        // draw the variance_band if requested
-        if( this.config.variance_band ) {
-            var bandPositions =
-                typeof this.config.variance_band == 'object'
-                    ? array.map( this.config.variance_band, function(v) { return parseFloat(v); } ).sort().reverse()
-                    : [ 2, 1 ];
-            this.getGlobalStats( dojo.hitch( this, function( stats ) {
-                if( ('scoreMean' in stats) && ('scoreStdDev' in stats) ) {
-                    var drawVarianceBand = function( plusminus, fill, label ) {
-                        context.fillStyle = fill;
-                        var varTop = toY( stats.scoreMean + plusminus );
-                        var varHeight = toY( stats.scoreMean - plusminus ) - varTop;
-                        varHeight = Math.max( 1, varHeight );
-                        context.fillRect( 0, varTop, canvas.width, varHeight );
-                        context.font = '12px sans-serif';
-                        if( plusminus > 0 ) {
-                            context.fillText( '+'+label, 2, varTop );
-                            context.fillText( '-'+label, 2, varTop+varHeight );
-                        }
-                        else {
-                            context.fillText( label, 2, varTop );
-                        }
-                    };
-
-                    var maxColor = new Color( this.config.style.variance_band_color );
-                    var minColor = new Color( this.config.style.variance_band_color );
-                    minColor.a /= bandPositions.length;
-
-                    var bandOpacityStep = 1/bandPositions.length;
-                    var minOpacity = bandOpacityStep;
-
-                    array.forEach( bandPositions, function( pos,i ) {
-                        drawVarianceBand( pos*stats.scoreStdDev,
-                                          Color.blendColors( minColor, maxColor, (i+1)/bandPositions.length).toCss(true),
-                                          pos+'σ');
-                    });
-                    drawVarianceBand( 0, 'rgba(255,255,0,0.7)', 'mean' );
-                }
-            }));
-        }
 
         // draw the origin line if it is not disabled
         var originColor = this.config.style.origin_color;
@@ -275,31 +231,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
 
         return options;
     },
-
-    /* determine if the methylation context is shown to save time when drawing */
-    _isShown: function( id ){
-        if( id == 'cg')
-            return this.config.showCG;
-        else if (id == 'chg')
-            return this.config.showCHG;
-        else if( id== 'chh' )
-            return this.config.showCHH;
-        else
-            return false;
-    },
-
-    _getFeatureColor: function(id) {
-        if( id == 'cg' )
-            return this.config.style.cg_color;
-        else if( id == 'chg' )
-            return this.config.style.chg_color;
-        else if( id = 'chh' )
-            return this.config.style.chh_color;
-        else
-            return 'black';
-
-    },
-
+    
     _calculatePixelScores: function( canvasWidth, features, featureRects ) {
         // make an array of the max score at each pixel on the canvas
         var pixelValues = new Array( canvasWidth );
@@ -333,27 +265,49 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         }
         return pixelValues;
     },
+    
+    _getScoreInfo: function(score){
+        var isNeg = (score<0?true:false);
+        var newScore = Math.abs(score) % 5;
+        var mLevel = newScore % 1;
+        mLevel = (isNeg ? mLevel * -1 : mLevel);
+        if( newScore > 2 )
+            return [mLevel, 'chh'];
+        else if( newScore > 1 )
+            return [mLevel, 'chg'];
+        else
+            return [mLevel, 'cg'];
+    },
 
     _calculateNewScore: function( score ){
-        if(score > 2)
-            return score - 2;
-        else if (score < -2)
-            return score + 2;
-        else if( score > 1 )
-            return score - 1;
-        else if(score < -1)
-            return score + 1;
-        else
-            return score;
+        var isNeg = (score<0?true:false);
+        var newScore = Math.abs(score) % 1;
+        newScore = (isNeg ? newScore * -1 : newScore);
+        return newScore;
     },
     
-    _getIdByScore: function( score ){
-        if (Math.abs(score) > 2)
-            return 'chh';
-        else if( Math.abs(score) > 1 )
-            return 'chg';
+    /* determine if the methylation context is shown to save time when drawing */
+    _isShown: function( id ){
+        if( id == 'cg')
+            return this.config.showCG;
+        else if (id == 'chg')
+            return this.config.showCHG;
+        else if( id== 'chh' )
+            return this.config.showCHH;
         else
-            return 'cg';
+            return false;
+    },
+
+    _getFeatureColor: function(id) {
+        if( id == 'cg' )
+            return this.config.style.cg_color;
+        else if( id == 'chg' )
+            return this.config.style.chg_color;
+        else if( id = 'chh' )
+            return this.config.style.chh_color;
+        else
+            return 'black';
+
     }
 
 });

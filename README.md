@@ -53,6 +53,10 @@ Track specifications are very similar to those for XYPlots (see JBrowse tutorial
         "type" : "MethylationPlugin/View/Track/Wiggle/MethylXYPlot"
     }
 
+##Future Plans
+- Animal-specific methylation coloring (CG and CH vs CG, CHG, CHH)
+- corrected global statistics
+
 ##Getting bedGraphToBigWig
 Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>
 Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>

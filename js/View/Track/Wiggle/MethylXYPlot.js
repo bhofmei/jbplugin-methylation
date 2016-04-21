@@ -44,7 +44,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 max_score: 1,
                 min_score: -1,
                 style: {
-                    origin_color: 'black'
+                    origin_color: 'dimgray'
                 },
             }
         );
@@ -178,8 +178,10 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
 //      console.log('_postDraw');
         var context = canvas.getContext('2d');
         var canvasHeight = canvas.height;
+
+        var ratio = Util.getResolution( context, this.browser.config.highResolutionMode );
         var toY = dojo.hitch( this, function( val ) {
-           return canvasHeight * (1-dataScale.normalize.call(this, val));
+           return canvasHeight * ( 1-dataScale.normalize(val) ) / ratio;
         });
         var thisB = this;
 

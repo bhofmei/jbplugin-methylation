@@ -181,13 +181,14 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         var toY = dojo.hitch( this, function( val ) {
            return canvasHeight * (1-dataScale.normalize.call(this, val));
         });
+        var thisB = this;
 
         // draw the origin line if it is not disabled
         var originColor = this.config.style.origin_color;
         if( typeof originColor == 'string' && !{'none':1,'off':1,'no':1,'zero':1}[originColor] ) {
             var originY = toY( dataScale.origin );
             context.fillStyle = originColor;
-            context.fillRect( 0, originY, canvas.width-1, 1 );
+            context.fillRect( 0, originY, canvas.width, 1 );
         }
     },
 

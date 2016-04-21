@@ -44,7 +44,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 max_score: 1,
                 min_score: -1,
                 style: {
-                    origin_color: 'dimgray'
+                    origin_color: 'gray'
                 },
             }
         );

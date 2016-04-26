@@ -270,21 +270,24 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
     },
     
     _getScoreInfo: function(score){
-        var isNeg = (score<0?true:false);
-        var newScore = Math.abs(score) % 5;
-        var mLevel = newScore % 1;
-        mLevel = (isNeg ? mLevel * -1 : mLevel);
-        if( newScore > 2 )
-            return [mLevel, 'chh'];
-        else if( newScore > 1 )
-            return [mLevel, 'chg'];
+        var newScore = this._calculateNewScore(score);
+        if( Math.abs(score) > 2 )
+            return [newScore, 'chh'];
+        else if( Math.abs(score) > 1 )
+            return [newScore, 'chg'];
         else
-            return [mLevel, 'cg'];
+            return [newScore, 'cg'];
     },
 
     _calculateNewScore: function( score ){
         var isNeg = (score<0?true:false);
-        var newScore = Math.abs(score) % 1;
+        var newScore = Math.abs(score);
+        // CHH
+        if (newScore > 2)
+            newScore = newScore - 2;
+        // CHG
+        else if(newScore > 1)
+            newScore = newScore - 1;
         newScore = (isNeg ? newScore * -1 : newScore);
         return newScore;
     },

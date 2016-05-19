@@ -1,4 +1,7 @@
 Release Notes for Methylation Plugin
+# Version 1.2.2 - May 19, 2016
+- corrected track menu check boxes so it agrees with the toolbar enable/disable
+- track menu checkboxes have color that indicate methylation context 
 
 # Version 1.2.1 - Feb 25, 2016
 - Updated the methylation colors and buttons to be red-green color blind friendly

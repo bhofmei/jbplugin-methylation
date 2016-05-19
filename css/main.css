@@ -4,6 +4,7 @@ span[widgetid=hidecg-btn] {
   top: -1px;
 }
 #hidecg-btn{
+  /* CG color: A36085 */
   height: 17px;
   width: 17px;
   background-image: url("../img/cg_enabled.png");
@@ -20,6 +21,7 @@ span[widgetid=hidechg-btn] {
   top: -1px;
 }
 #hidechg-btn{
+  /* CHG color: 0072B2 */
   height: 17px;
   width: 17px;
   background-image: url("../img/chg_enabled.png");
@@ -36,6 +38,7 @@ span[widgetid=hidechh-btn] {
   top: -1px;
 }
 #hidechh-btn{
+  /* CHH color: CF8F00 */
   height: 17px;
   width: 17px;
   background-image: url("../img/chh_enabled.png");
@@ -45,3 +48,30 @@ span[widgetid=hidechh-btn] {
 #hidechh-btn[hidden-chh] {
   background-image: url("../img/chh_disabled.png");
 } 
+
+/* hide CH button */
+span[widgetid=hidech-btn] {
+  position:relative;
+  top: -1px;
+}
+#hidech-btn{
+  /* CH color: 88c043 */
+  height: 17px;
+  width: 17px;
+  background-image: url("../img/ch_enabled.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+#hidech-btn[hidden-ch] {
+  background-image: url("../img/ch_disabled.png");
+}
+
+tr.track-cg-checkbox img.dijitCheckedMenuItemIcon{
+    background-image: url("../img/checkmark-cg.png")
+}
+tr.track-chg-checkbox img.dijitCheckedMenuItemIcon{
+    background-image: url("../img/checkmark-chg.png")
+}
+tr.track-chh-checkbox img.dijitCheckedMenuItemIcon{
+    background-image: url("../img/checkmark-chh.png")
+}

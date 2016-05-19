@@ -34,6 +34,7 @@ define('MethylationPlugin/main',[
             'dojo/on',
             'dojo/query',
             'dojo/dom-geometry',
+    "dijit/registry",
       'JBrowse/Plugin',
     'dijit/MenuItem',
     "JBrowse/Browser",
@@ -53,6 +54,7 @@ define('MethylationPlugin/main',[
            on,
            query,
            domGeom,
+            registry,
            JBrowsePlugin,
             dijitMenuItem,
             Browser,
@@ -69,7 +71,6 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var browser = this.browser;
         browser.afterMilestone( 'initView', function() {
-
             var navBox = dojo.byId("navbox");
 
             browser.hideCGButton = new dijitButton(
@@ -78,7 +79,7 @@ return declare( JBrowsePlugin,
                 id: "hidecg-btn",
                 width: "22px",
                 onClick: dojo.hitch( thisB, function(event) {
-                    browser.showCGFunction();
+                    browser._showCGFunction();
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox)); // end cg button
@@ -89,7 +90,7 @@ return declare( JBrowsePlugin,
                 id: "hidechg-btn",
                 width: "22px",
                 onClick: dojo.hitch( thisB, function(event) {
-                    browser.showCHGFunction();
+                    browser._showCHGFunction();
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox)); // end chg button
@@ -100,7 +101,7 @@ return declare( JBrowsePlugin,
                 id: "hidechh-btn",
                 width: "22px",
                 onClick: dojo.hitch( thisB, function(event) {
-                    browser.showCHHFunction();
+                    browser._showCHHFunction();
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox)); // end chh button
@@ -134,7 +135,7 @@ return declare( JBrowsePlugin,
         });
         }   // end browser.config.show_nav
 
-        browser.showCGFunction = function() {
+        browser._showCGFunction = function() {
             // does the hide/show button exists yet?
             if (dojo.byId('hidecg-btn')==null) return;
 
@@ -155,6 +156,9 @@ return declare( JBrowsePlugin,
                 return;
                 track.config.showCG = isShow;
                 track.changed();
+                var mark = registry.byId(track.config.label+'cg-checkbox');
+                if(mark)
+                    mark.set("checked",isShow);
             });
             // protect Hide button from clicks durng animation
             dojo.attr(dom.byId("hidecg-btn"),"disabled","");
@@ -163,7 +167,7 @@ return declare( JBrowsePlugin,
             }, 1000);
         }
         
-        browser.showCHGFunction = function() {
+        browser._showCHGFunction = function() {
             // does the hide/show button exists yet?
             if (dojo.byId('hidechg-btn')==null) return;
             
@@ -183,6 +187,9 @@ return declare( JBrowsePlugin,
                 return;
                 track.config.showCHG = isShow;
                 track.changed();
+                var mark = registry.byId(track.config.label+'chg-checkbox');
+                if(mark)
+                    mark.set("checked",isShow);
             });
             // protect Hide button from clicks durng animation
             dojo.attr(dom.byId("hidechg-btn"),"disabled","");
@@ -191,7 +198,7 @@ return declare( JBrowsePlugin,
             }, 1000);
         }
         
-        browser.showCHHFunction = function() {
+        browser._showCHHFunction = function() {
             // does the hide/show button exists yet?
             if (dojo.byId('hidechh-btn')==null) return;
             
@@ -211,6 +218,9 @@ return declare( JBrowsePlugin,
                 return;
                 track.config.showCHH = isShow;
                 track.changed();
+                var mark = registry.byId(track.config.label+'cg-checkbox');
+                if(mark)
+                    mark.set("checked",isShow);
             });
             // protect Hide button from clicks durng animation
             dojo.attr(dom.byId("hidechh-btn"),"disabled","");

@@ -22,7 +22,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
  */
 {
     constructor: function() {
-        console.log(this);
         //this.inherited(arguments); // call superclass constructor
 
         if (typeof(this.config.style.cg_color) == "undefined")

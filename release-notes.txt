@@ -1,5 +1,8 @@
 Release Notes for Methylation Plugin
 
+# Version 2.0.1 - Jun 24, 2016
+- removed flag colors because they didn't work well with overlapping features
+
 # Verison 2.0.0 - Jun 24, 2016
 - Prefered methylation visualization track type "MethylPlot" which uses the "MethylBigWig" Store
   - MethylBigWig looks for three separate BigWig files based on context

@@ -242,52 +242,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         return options;
     },
     
-    mouseover: function( bpX, evt ) {
-        var thisB = this;
-        // if( this._scoreDisplayHideTimeout )
-        //     window.clearTimeout( this._scoreDisplayHideTimeout );
-        if( bpX === undefined ) {
-            var thisB = this;
-            //this._scoreDisplayHideTimeout = window.setTimeout( function() {
-                thisB.scoreDisplay.flag.style.display = 'none';
-                thisB.scoreDisplay.pole.style.display = 'none';
-            //}, 1000 );
-        }
-        else {
-            var block;
-            array.some(this.blocks, function(b) {
-                           if( b && b.startBase <= bpX && b.endBase >= bpX ) {
-                               block = b;
-                               return true;
-                           }
-                           return false;
-                       });
-
-            if( !( block && block.canvas && block.pixelScores && evt ) )
-                return;
-
-            var pixelValues = block.pixelScores;
-            var canvas = block.canvas;
-            var cPos = dojo.position( canvas );
-            var x = evt.pageX;
-            var cx = evt.pageX - cPos.x;
-
-            if( this._showPixelValue( this.scoreDisplay.flag, pixelValues[ Math.round( cx ) ] ) ) {
-                var score = pixelValues[ Math.round( cx ) ];
-                if(score.hasOwnProperty('feat')){
-                    var id = score['feat']['data']['source'];
-                    this.scoreDisplay.flag.style.backgroundColor = thisB._getFlagColor(id);
-                }
-                this.scoreDisplay.flag.style.display = 'block';
-                this.scoreDisplay.pole.style.display = 'block';
-
-                this.scoreDisplay.flag.style.left = evt.clientX+'px';
-                this.scoreDisplay.flag.style.top  = cPos.y+'px';
-                this.scoreDisplay.pole.style.left = evt.clientX+'px';
-                this.scoreDisplay.pole.style.height = cPos.h+'px';
-            }
-        }
-    },
     
     /* determine if the methylation context is shown to save time when drawing */
     _isShown: function( id ){
@@ -317,16 +271,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         var color = new Color(this._getConfigColor(id));
         color.a = 0.8;
         return color.toString();
-    },
-    
-    _getFlagColor: function(id){
-        var color = new Color(this._getConfigColor(id));
-        color.r = Math.min(255, Math.round(color.r + 51));
-        color.g = Math.min(255, Math.round(color.g + 51));
-        color.b = Math.min(255, Math.round(color.b + 51));
-        //color.a =0.8;
-        return color.toString();
-    }
+    } 
 
 });
 

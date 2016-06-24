@@ -1,4 +1,12 @@
 Release Notes for Methylation Plugin
+
+# Verison 2.0.0 - Jun 24, 2016
+- Prefered methylation visualization track type "MethylPlot" which uses the "MethylBigWig" Store
+  - MethylBigWig looks for three separate BigWig files based on context
+  - Fixes the issues with context for zooming
+- Older methylation track is still supported as the MethylXYPlot using BigWig store.
+- New methylation track also uses color in mouseover value flags
+
 # Version 1.2.2 - May 19, 2016
 - corrected track menu check boxes so it agrees with the toolbar enable/disable
 - track menu checkboxes have color that indicate methylation context 

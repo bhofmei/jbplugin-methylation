@@ -1,28 +1,42 @@
-import sys, math, multiprocessing, subprocess, os
+import sys, math, glob, multiprocessing, subprocess, os
 
-# Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+# Usage: python3 allc_to_bigwig_pe.py [-keep] [-no-clean] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
 
 # NOTE: allc file contains the methylation information for all chromosomes
 
 # Steps:
 # 1. allC to bedGraph
-# 2. sort bedGraph if necessary
+# 2. sort bedGraph
 # 3. bedGraph to BigWig
 # 4. remove temporary files
 
 NUMPROC=1
 
-def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, isSort, useAll ):
-	print( 'Keep temp files: {:s}; Sort bedGraph: {:s}; Use all positions: {:s}'.format( str( keepTmp), str (isSort), str(useAll)))
+def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, needClean, isSort, useAll ):
+	print( 'Clean chrm names: {:s}; Keep temp files: {:s}; Sort bedGraph: {:s}; Use all positions: {:s}'.format( str(needClean), str( keepTmp), str (isSort), str(useAll)))
+	if needClean:
+		chrmList = readChrmFile( chrmFileStr )
+	else:
+		chrmList = None
 	print( 'Begin processing files with {:d} processors'.format( numProc ) )
 	pool = multiprocessing.Pool( processes=numProc )
-	results = [ pool.apply_async( processFile, args=(allCFileAr[i], chrmFileStr, labelsAr[i], outID, keepTmp, isSort, useAll) ) for i in range(len(allCFileAr)) ]
+	results = [ pool.apply_async( processFile, args=(allCFileAr[i], chrmFileStr, chrmList, labelsAr[i], outID, keepTmp, isSort, useAll) ) for i in range(len(allCFileAr)) ]
 	suc = [ p.get() for p in results ]
 	
 	print( 'Done' )
 
+def readChrmFile( inFileStr ):
+	inFile = open( inFileStr, 'r' )
+	chrmList= []
+	
+	for line in inFile:
+		lineAr = line.rstrip().split( '\t' )
+		# (0) chrm (1) length ...
+		chrmList += [ lineAr[0] ]
+	inFile.close()
+	return chrmList
 
-def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort, useAll ):
+def processFile( allCFileStr, chrmFileStr, chrmList, label, outID, keepTmp, isSort, useAll ):
 	if outID == None and label == None:
 		outID = allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
 	elif outID == None:
@@ -33,34 +47,31 @@ def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort, useAll
 		outID += '_' + label
 	
 	print( 'Reading allC file {:s}'.format( allCFileStr ) )
-	# allC to bedGraphs
+	# allC to bedGraph
 	bedGraphStr =  outID + '.bedGraph'
-	bedGraphAr = [bedGraphStr + '.' + x for x in ['cg','chg','chh'] ]
-	readAllC( allCFileStr, bedGraphAr, useAll )
+	readAllC( allCFileStr, bedGraphStr, chrmList, useAll )
 	
 	if isSort:
-		print( 'Sorting bedGraph files' )
-		for b in bedGraphAr:
-			sortBedFile( b )
+		print( 'Sorting bedGraph file' )
+		sortBedFile( bedGraphStr )
 	
-	print( 'Converting {:s} files to BigWig'.format(bedGraphStr ) )
+	print( 'Converting {:s} file to BigWig'.format(bedGraphStr ) )
 	# bedGraph to bigWig
-	for b in bedGraphAr:
-		processBedGraph( b, chrmFileStr )
+	processBedGraph( bedGraphStr, chrmFileStr )
 	
 	# remove temporary
 	if keepTmp == False:
 		print( 'Removing temporary files...' )
-		for b in bedGraphAr:
-			os.remove( b )
-	print( 'BigWig finished for {:s}.bw.*'.format( outID ) )
+		os.remove( bedGraphStr )
+	print( 'BigWig finished for {:s}.bw'.format( outID ) )
 
-def readAllC( allCFileStr, outFileAr, useAll ):
+def readAllC( allCFileStr, outFileStr, chrmList, useAll ):
 	
 	allCFile = open( allCFileStr, 'r' )
-	outFileAr = [open( outFileStr, 'w' ) for outFileStr in outFileAr]
+	outFile = open( outFileStr, 'w' )
 	
 	mTypes = [ 'CG', 'CHG', 'CHH' ]
+	mTypeAdd = [0, 1, 2]
 	
 	for line in allCFile:
 		lineAr = line.rstrip().split('\t')
@@ -70,6 +81,12 @@ def readAllC( allCFileStr, outFileAr, useAll ):
 			continue
 		elif ( useAll and int(lineAr[4])> 0 ) or int( lineAr[6] ):
 			chrm = lineAr[0]
+			if chrmList != None:
+				name = formatChrmName( chrm )
+				if name == False or name not in chrmList:
+					continue
+				else:
+					chrm = name
 			pos = int( lineAr[1] ) - 1
 			methType = decodeMethType( lineAr[3] )
 			try:
@@ -77,18 +94,50 @@ def readAllC( allCFileStr, outFileAr, useAll ):
 			except ValueError:
 				continue
 			value = float( lineAr[4] ) / float( lineAr[5] )
+			# adjust for methylation type
+			value = value + mTypeAdd[ mInd ]
 			# adjust for negative strand
 			if lineAr[2] == '-':
 				value = value * -1
 			
 			# (0) chrm (1) start (2) end (3) value
 			outStr = '{:s}\t{:d}\t{:d}\t{:f}\n'.format( chrm, pos, pos+1, value )
-			outFile = outFileAr[mInd]
 			outFile.write( outStr )
 		# end if
 	# end for
 	allCFile.close()
-	[ outFile.close() for outFile in outFileAr ]
+	outFile.close()
+
+def formatChrmName( inName ):
+	
+	chrm = inName.lower()
+	if chrm == 'c' or chrm == 'chloroplast' or chrm == 'chrc':
+		'ChrC'
+	elif chrm == 'm' or chrm == 'mitochondria' or chrm == 'chrm' or chrm == 'mt':
+		return 'ChrM'
+	elif chrm == 'l' or chrm == 'lambda' or chrm == 'chrl':
+		return 'ChrL'
+	# digit only number
+	elif chrm.isdigit():
+		return 'Chr'+chrm
+	elif chrm.startswith( 'chromosome0' ):
+		return chrm.replace( 'chromosome0', 'Chr' )
+	elif chrm.startswith( 'chromosome' ):
+		return chrm.replace( 'chromosome', 'Chr' )
+	elif chrm.startswith( 'chrm0' ):
+		return chrm.replace( 'chrm0', 'Chr' )
+	elif chrm.startswith( 'chrm' ):
+		return chrm.replace( 'chrm', 'Chr' )
+	elif chrm.startswith( 'chr0' ):
+		return chrm.replace( 'chr0', 'Chr' )
+	elif chrm.startswith( 'chr' ):
+		return chrm.replace( 'chr', 'Chr' )
+	elif chrm.startswith( 'scaffold' ):
+		return chrm
+	elif chrm.startswith( 'contig' ):
+		return chrm
+	else:
+		return chrm
 
 def decodeMethType( mStr ):
 	
@@ -115,9 +164,10 @@ def processBedGraph( bedGraphStr, chrmFileStr ):
 	
 
 def parseInputs( argv ):
-	# Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+	# Usage: python3 allc_to_bigwig_pe.py [-keep] [-no-clean] [-L=labels] [-p=num_proc] [-o=out_id] <chrm_sizes>  <allC_file> [allC_file]*
 	
 	keepTmp = False
+	needClean = True
 	labelsAr = []
 	numProc = NUMPROC
 	isSort = False
@@ -125,9 +175,12 @@ def parseInputs( argv ):
 	outID = None
 	startInd = 0
 	
-	for i in range( min(5, len(argv)-2) ):
+	for i in range( min(9, len(argv)-2) ):
 		if argv[i] == '-keep':
 			keepTmp = True
+			startInd += 1
+		elif argv[i] == '-no-clean':
+			needClean = False
 			startInd += 1
 		elif argv[i] == '-sort':
 			isSort = True
@@ -166,20 +219,21 @@ def parseInputs( argv ):
 		print( "ERROR: number of labels doesn't match number of allC files" )
 		exit()
 	
-	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, isSort, useAll )
+	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, needClean, isSort, useAll )
 
 def printHelp():
-	print ("Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*")
-	print( 'Converts allC files to context-specific BigWig files' )
+	print ("Usage: python3 allc_to_bigwig_pe.py [-keep] [-no-clean] [-sort] [-all] [-L=labels] [-o=outID] [-p=num_proc] <chrm_file>  <allC_file> [allC_file]*")
+	print( 'Converts allC files to BigWig file with context-specific values' )
 	print( 'Note: bedGraphToBigWig and bedSort programs must be in the path' )
 	print( 'Required:' )
 	print( 'chrm_file\ttab-delimited file with chromosome names and lengths,\n\t\ti.e. fasta index file' )
 	print( 'allc_file\tallc file with all chrms and contexts' )
 	print( 'Optional:' )
 	print( '-keep\t\tkeep intermediate files' )
+	print( '-no-clean\tdoes not check chromosome names match chrm file;\n\t\tnot recommended' )
 	print( '-sort\tcalls bedSort; add this option if bigwig conversion fails' )
 	print( '-all\tuse all positions with methylation not just methylated ones' )
-	print( '-L=labels\tcomma-separated list of labels to use for the allC files;\n\t\tdefaults to using information from the allc file name' )
+	print( '-l=labels\tcomma-separated list of labels to use for the allC files;\n\t\tdefaults to using information from the allc file name' )
 	print( '-o=out_id\toptional identifier to be added to the output file names' )
 	print( '-p=num_proc\tnumber of processors to use [default 1]' )
 	

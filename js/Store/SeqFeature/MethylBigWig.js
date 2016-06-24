@@ -20,16 +20,18 @@ define( 'MethylationPlugin/Store/SeqFeature/MethylBigWig',[
     ){
 return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
 {
+    /* This file was adapted from https://github.com/cmdcolin/multibigwig */
     /**
      * Data backend for multiple bigwig files 
      */
     constructor: function( args ) {
         var thisB = this;
         var methylationTypes = ['cg','chg','chh'];
+        //var methylationTypes = ['chh','chg','cg'];
         var newFiles = array.map(methylationTypes,function(m){
             return {url: args.urlTemplate + '.' + m, name: m};
         });
-        console.log(newFiles);
+        //console.log(newFiles);
         this.stores = array.map( newFiles, function( n ) {
             return new BigWig( dojo.mixin(args, {urlTemplate: n.url, name: n.name}) );
         });
@@ -92,12 +94,6 @@ return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
         array.forEach( this.stores, function(store) {
             store.getRegionStats( query, finishCallback, errorCallback );
         });
-    },
-
-    saveStore: function() {
-        return {
-            urlTemplates: this.config.urlTemplates
-        };
     }
 
 });

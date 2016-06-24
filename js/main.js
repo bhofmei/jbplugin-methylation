@@ -22,50 +22,49 @@ return declare( Component,
 });
 }}});
 define('MethylationPlugin/main',[ 
-      'dojo/_base/declare',
+    'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
-            'dojo/Deferred',
-            'dojo/dom-construct',
-            'dijit/form/Button',
-            'dojo/fx',
-            'dojo/dom',
-            'dojo/dom-style',
-            'dojo/on',
-            'dojo/query',
-            'dojo/dom-geometry',
+    'dojo/Deferred',
+    'dojo/dom-construct',
+    'dijit/form/Button',
+    'dojo/fx',
+    'dojo/dom',
+    'dojo/dom-style',
+    'dojo/on',
+    'dojo/query',
+    'dojo/dom-geometry',
     "dijit/registry",
-      'JBrowse/Plugin',
+    'JBrowse/Plugin',
     'dijit/MenuItem',
     "JBrowse/Browser",
     'JBrowse/View/Dialog/SetTrackHeight',
-      './View/Track/Wiggle/MethylXYPlot',
-    './View/Track/Wiggle/MultiMethylXYPlot',
+    './View/Track/Wiggle/MethylXYPlot',
+    './View/Track/Wiggle/MethylPlot',
     './Store/SeqFeature/MethylBigWig'
-    
-       ],
-       function(
-           declare,
-            array,
-            lang,
-           Deferred,
-           domConstruct,
-           dijitButton,
-           coreFx,
-           dom,
-           style,
-           on,
-           query,
-           domGeom,
-            registry,
-           JBrowsePlugin,
-            dijitMenuItem,
-            Browser,
-            SetTrackHeightDialog,
-           MethylXYPlot,
-            MultiMethylXYPlot,
-            MethylBigWig
-       ){
+],
+function(
+    declare,
+    array,
+    lang,
+    Deferred,
+    domConstruct,
+    dijitButton,
+    coreFx,
+    dom,
+    style,
+    on,
+    query,
+    domGeom,
+    registry,
+    JBrowsePlugin,
+    dijitMenuItem,
+    Browser,
+    SetTrackHeightDialog,
+    MethylXYPlot,
+    MethylPlot,
+    MethylBigWig
+){
  
 return declare( JBrowsePlugin,
 {
@@ -77,7 +76,6 @@ return declare( JBrowsePlugin,
         var browser = this.browser;
         browser.afterMilestone( 'initView', function() {
             var navBox = dojo.byId("navbox");
-
             browser.hideCGButton = new dijitButton(
             {
                 title: "Show/Hide CG Methylation",
@@ -126,8 +124,8 @@ return declare( JBrowsePlugin,
                         setCallback: function( height ) {
                             var tracks = browser.view.visibleTracks();
                             array.forEach( tracks, function( track ) {
-                                // operate only on XYPlot or Density tracks
-                                if( ! /\b(MethylXYPlot)/.test( track.config.type ) ){
+                                // operate only MethylXYPlot and MethylPlot tracks
+                                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) )){
                                     return;
                                 }
                                 track.trackHeightChanged=true;
@@ -157,7 +155,7 @@ return declare( JBrowsePlugin,
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
                 // operate only on XYPlot or Density tracks
-                if( ! /\b(MethylXYPlot)/.test( track.config.type ) )
+                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
                 return;
                 track.config.showCG = isShow;
                 track.changed();
@@ -188,7 +186,7 @@ return declare( JBrowsePlugin,
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
                 // operate only on XYPlot or Density tracks
-                if( ! /\b(MethylXYPlot)/.test( track.config.type ) )
+                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
                 return;
                 track.config.showCHG = isShow;
                 track.changed();
@@ -219,7 +217,7 @@ return declare( JBrowsePlugin,
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
                 // operate only on XYPlot or Density tracks
-                if( ! /\b(MethylXYPlot)/.test( track.config.type ) )
+                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
                 return;
                 track.config.showCHH = isShow;
                 track.changed();

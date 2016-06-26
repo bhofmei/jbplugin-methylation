@@ -1,4 +1,9 @@
 Release Notes for Methylation Plugin
+# Version 2.1.0 - Jun 26, 2016
+- Additional configuration option "context" that searches only for the specified contexts
+  - necessary when not all (CG, CHG, CHH) are present
+  - necessary when file extensions are not exactly '.bw.cg', '.bw.chg', '.bw.chh'
+  - if not specified and file is missing, error is displayed on screen rather than ignoring the context
 
 # Version 2.0.1 - Jun 24, 2016
 - removed flag colors because they didn't work well with overlapping features

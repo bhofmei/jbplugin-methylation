@@ -3,6 +3,7 @@ define( 'MethylationPlugin/Store/SeqFeature/MethylBigWig',[
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/promise/all',
+    'dojo/request/xhr',
     'JBrowse/Store/SeqFeature',
     'JBrowse/Store/DeferredStatsMixin',
     'JBrowse/Store/DeferredFeaturesMixin',
@@ -13,6 +14,7 @@ define( 'MethylationPlugin/Store/SeqFeature/MethylBigWig',[
         lang,
         array,
         all,
+        xhr,
         SeqFeatureStore,
         DeferredFeaturesMixin,
         DeferredStatsMixin,
@@ -26,27 +28,28 @@ return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
      */
     constructor: function( args ) {
         var thisB = this;
-        var methylationTypes = ['cg','chg','chh'];
-        //var methylationTypes = ['chh','chg','cg'];
-        var newFiles = array.map(methylationTypes,function(m){
+        if(args.config.context === undefined){
+            this.config.context = ['cg','chg','chh'];
+        }else{
+            this.config.context = array.map(args.config.context, function(x){return x.toLowerCase()})
+        }
+        var newFiles = array.map(thisB.config.context,function(m){
             return {url: args.urlTemplate + '.' + m, name: m};
         });
-        //console.log(newFiles);
+        
         this.stores = array.map( newFiles, function( n ) {
             return new BigWig( dojo.mixin(args, {urlTemplate: n.url, name: n.name}) );
         });
-
         all( array.map( this.stores, function(store) {
             return store._deferred.features
         })).then( function() {
             thisB._deferred.features.resolve({success: true});
             thisB._deferred.stats.resolve({success: true});
         },
-        lang.hitch( this, '_failAllDeferred' ));
-        console.log(this.stores);
+            lang.hitch( this, '_failAllDeferred' )
+        );
     },
 
-    
     _getFeatures: function( query, featureCallback, endCallback, errorCallback ) {
         var thisB = this;
         var finished = 0;

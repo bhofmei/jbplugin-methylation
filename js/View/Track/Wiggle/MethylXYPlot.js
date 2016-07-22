@@ -30,9 +30,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         	this.config.style.chg_color = '#0072B2';
         if (typeof(this.config.style.chh_color) == "undefined")
         	this.config.style.chh_color = '#CF8F00';
-        this.config.showCG = true;
-        this.config.showCHG = true;
-        this.config.showCHH = true;
         //console.log('methylxyplot2 constructor');
     },
 
@@ -46,6 +43,9 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 style: {
                     origin_color: 'gray'
                 },
+                showCG: true,
+                showCHG: true,
+                showCHH: true
             }
         );
     },

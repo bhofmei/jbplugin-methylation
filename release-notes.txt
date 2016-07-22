@@ -1,4 +1,8 @@
 Release Notes for Methylation Plugin
+# Version 2.1.2 - Jul 22, 2016
+- showCG, showCHG, showCHH are part of default configs 
+- this change is important for the screenshot plugin to work properly
+
 # Version 2.1.1 - Jun 26, 2016
 - fixed error with track checkboxes id when changing reference sequences
 

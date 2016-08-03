@@ -3,7 +3,6 @@ define( 'MethylationPlugin/Store/SeqFeature/MethylBigWig',[
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/promise/all',
-    'dojo/request/xhr',
     'JBrowse/Store/SeqFeature',
     'JBrowse/Store/DeferredStatsMixin',
     'JBrowse/Store/DeferredFeaturesMixin',
@@ -14,7 +13,6 @@ define( 'MethylationPlugin/Store/SeqFeature/MethylBigWig',[
         lang,
         array,
         all,
-        xhr,
         SeqFeatureStore,
         DeferredFeaturesMixin,
         DeferredStatsMixin,
@@ -28,28 +26,55 @@ return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
      */
     constructor: function( args ) {
         var thisB = this;
-        if(args.config.context === undefined){
-            this.config.context = ['cg','chg','chh'];
-        }else{
-            this.config.context = array.map(args.config.context, function(x){return x.toLowerCase()})
-        }
-        var newFiles = array.map(thisB.config.context,function(m){
+        var methylationTypes = ['cg','chg','chh'];
+        //var methylationTypes = ['chh','chg','cg'];
+        var newFiles = array.map(methylationTypes,function(m){
             return {url: args.urlTemplate + '.' + m, name: m};
         });
-        
+        //console.log(newFiles);
         this.stores = array.map( newFiles, function( n ) {
             return new BigWig( dojo.mixin(args, {urlTemplate: n.url, name: n.name}) );
         });
+
         all( array.map( this.stores, function(store) {
             return store._deferred.features
         })).then( function() {
+
             thisB._deferred.features.resolve({success: true});
             thisB._deferred.stats.resolve({success: true});
+            thisB._checkZoomLevels();
+            console.log(thisB.stores);
         },
-            lang.hitch( this, '_failAllDeferred' )
-        );
+        lang.hitch( this, '_failAllDeferred' ));
+        //console.log(this.stores);
+        // get store zoom levels
+
+        var zoomLevels = array.map(this.stores, function(store){
+            //console.log(store);
+        });
+        //console.log(zoomLevels);
     },
 
+    _checkZoomLevels: function(){
+
+        var zoomLevels = array.map(this.stores, function(store){
+            return store.numZoomLevels
+        });
+        var minLevels = Math.min.apply(null, zoomLevels);
+        var maxLevels = Math.max.apply(null, zoomLevels);
+        // if they aren't equal, remove levels
+        if(minLevels !== maxLevels){
+            // loop through stores
+            array.forEach(this.stores, function(store){
+               var nRemove = store.numZoomLevels - minLevels;
+                if (nRemove!==0){
+                    store.zoomLevels.splice(0, nRemove);
+                    store.numZoomLevels = store.zoomLevels.length;
+                }
+            });
+        }
+    },
+    
     _getFeatures: function( query, featureCallback, endCallback, errorCallback ) {
         var thisB = this;
         var finished = 0;

@@ -49,7 +49,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
     -p=num_proc     number of processors to use [default 1]  
     -o=outID        optional string to include in output file names
 ~~~~
--Conversion Version 2:
+*Conversion Version 2:
 ~~~~
      python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
      -keep\t\tkeep intermediate files
@@ -58,7 +58,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
      -L=labels\tcomma-separated list of labels to use for the allC
      -o=out_id\toptional identifier to be added to the output file names
      -p=num_proc\tnumber of processors to use [default 1]
-
+~~~~
 Other file types: contact me
 
 ###JSON Track Specifications

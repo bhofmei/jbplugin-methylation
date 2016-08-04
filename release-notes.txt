@@ -1,4 +1,7 @@
 Release Notes for Methylation Plugin
+# Version 2.2.1 - Aug 4, 2016
+- fixed bug where specifying methylation contexts was ignored
+
 # Version 2.2.0 - Aug 3, 2016
 - MethylBigWig uses lowest common zoom level between the contexts of the same track
   - previously, contexts could appear very different at certain zooms because they had different number of zoom levels

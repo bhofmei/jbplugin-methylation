@@ -45,7 +45,7 @@ return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
             thisB._deferred.features.resolve({success: true});
             thisB._deferred.stats.resolve({success: true});
             thisB._checkZoomLevels();
-            console.log(thisB.stores);
+            //console.log(thisB.stores);
         },
         lang.hitch( this, '_failAllDeferred' ));
         //console.log(this.stores);

@@ -76,6 +76,7 @@ Version 1
     }
     
 Version 2
+
 _urlTemplate_ is the path and filename up-to, but not including, the context-specific extension. For example `"urlTemplate" : "path/my-file.bw"` from example above.
 
     {  
@@ -99,6 +100,8 @@ Using the animal coloring scheme is enforced hierarchically. Configurations spec
 | | `tracks.conf` | `[general]`<br>`isAnimal=true` |
 | | `jbrowse.conf` | `[general]` <br> `isAnimal=true` |
 |*lowest*| **default** | `isAnimal=false`|
+
+Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 
 ##Future Plans
 - corrected global statistics

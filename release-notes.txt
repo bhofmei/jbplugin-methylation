@@ -1,4 +1,7 @@
 Release Notes for Methylation Plugin
+# Version 2.3.0 - Aug 26, 2016
+- animal-specific coloring
+
 # Version 2.2.1 - Aug 4, 2016
 - fixed bug where specifying methylation contexts was ignored
 

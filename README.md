@@ -86,9 +86,21 @@ _urlTemplate_ is the path and filename up-to, but not including, the context-spe
         "urlTemplate" : "path/to/bigwig_file.bw",
         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot"
     }
+If there is not a file for all contexts (CG, CHG, and CHH), include the following in the track configuration and specify only the contexts needed. 
+    
+### Animal-specific coloring
+While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see above).
+
+Using the animal coloring scheme is enforced hierarchically. Configurations specified at a higher level overpower lower-level specification. If not specified at a specific level, inherits the setting of the level below. 
+
+| level| location | syntax|
+|--|--|--|
+|*highest* | individual track config | `isAnimal=true` |
+| | `tracks.conf` | `[general]`<br>`isAnimal=true` |
+| | `jbrowse.conf` | `[general]` <br> `isAnimal=true` |
+|*lowest*| **default** | `isAnimal=false`|
 
 ##Future Plans
-- Animal-specific methylation coloring (CG and CH vs CG, CHG, CHH)
 - corrected global statistics
 
 ##Getting bedGraphToBigWig and bedSort

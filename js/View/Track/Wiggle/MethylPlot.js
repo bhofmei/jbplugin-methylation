@@ -24,13 +24,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
 {
     constructor: function() {
 
-        if (typeof(this.config.style.cg_color) == "undefined")
-        	this.config.style.cg_color = '#A36085';
-        if (typeof(this.config.style.chg_color) == "undefined")
-        	this.config.style.chg_color = '#0072B2';
-        if (typeof(this.config.style.chh_color) == "undefined")
-        	this.config.style.chh_color = '#CF8F00';
-        //console.log('methylxyplot2 constructor');
     },
 
     _defaultConfig: function() {
@@ -41,11 +34,15 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 max_score: 1,
                 min_score: -1,
                 style: {
-                    origin_color: 'gray'
+                    origin_color: 'gray',
+                    cg_color:'#A36085',
+                    chg_color:'#0072B2',
+                    chh_color:'#CF8F00'
                 },
                 showCG: true,
                 showCHG: true,
-                showCHH: true
+                showCHH: true,
+                isAnimal: false
             }
         );
     },
@@ -210,12 +207,31 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     id: track.config.label + '-' + track.refSeq.name + '-cg-checkbox',
                     class: 'track-cg-checkbox',
                     onClick: function(event) {
-                        console.log(this);
                         track.config.showCG = this.checked;
                         track.changed();
                     }
-                },
-                {
+                }
+            ]);
+        if(this.config.isAnimal){
+            options.push.apply(
+            options,
+            [{
+                    label: 'Show CH Methylation',
+                    type: 'dijit/CheckedMenuItem',
+                    checked: (track.config.showCHG && track.config.showCHH),
+                    id: track.config.label + '-' + track.refSeq.name + '-ch-checkbox',
+                    class: 'track-ch-checkbox',
+                    onClick: function(event) {
+                        track.config.showCHG = this.checked;
+                        track.config.showCHH = this.checked;
+                        track.changed();
+                    }
+                }
+            ]);
+        } else {
+            options.push.apply(
+            options,
+            [ {
                     label: 'Show CHG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHG,
@@ -238,8 +254,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     }
                 }
             ]);
-
-
+        }
         return options;
     },
     
@@ -248,9 +263,11 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
     _isShown: function( id ){
         if( id == 'cg')
             return this.config.showCG;
+        else if(this.config.isAnimal) // ch
+            return (this.config.showCHG && this.config.showCHH)
         else if (id == 'chg')
             return this.config.showCHG;
-        else if( id== 'chh' )
+        else if( id == 'chh' )
             return this.config.showCHH;
         else
             return false;
@@ -259,9 +276,11 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
     _getConfigColor: function(id) {
         if( id == 'cg' )
             return this.config.style.cg_color;
+        else if(this.config.isAnimal) // ch
+            return this.config.style.ch_color;
         else if( id == 'chg' )
             return this.config.style.chg_color;
-        else if( id = 'chh' )
+        else if( id == 'chh' )
             return this.config.style.chh_color;
         else
             return 'black';
@@ -272,8 +291,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         var color = new Color(this._getConfigColor(id));
         color.a = 0.8;
         return color.toString();
-    } 
-
+    }
 });
 
 return XYPlot;

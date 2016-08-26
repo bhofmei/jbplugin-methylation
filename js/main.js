@@ -1,27 +1,4 @@
-require({cache:{
-'JBrowse/Plugin':function(){
-define("JBrowse/Plugin", [
-           'dojo/_base/declare',
-           'JBrowse/Component'
-       ],
-       function( declare, Component ) {
-return declare( Component,
-{
-    constructor: function( args ) {
-        this.name = args.name;
-        this.cssLoaded = args.cssLoaded;
-        this._finalizeConfig( args.config );
-    },
-
-    _defaultConfig: function() {
-        return {
-            baseUrl: '/plugins/'+this.name
-        };
-    }
-});
-});
-}}});
-define('MethylationPlugin/main',[ 
+define('MethylationPlugin/main', [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
@@ -36,6 +13,7 @@ define('MethylationPlugin/main',[
     'dojo/dom-geometry',
     "dijit/registry",
     'JBrowse/Plugin',
+    'JBrowse/Util',
     'dijit/MenuItem',
     "JBrowse/Browser",
     'JBrowse/View/Dialog/SetTrackHeight',
@@ -58,6 +36,7 @@ function(
     domGeom,
     registry,
     JBrowsePlugin,
+    Util,
     dijitMenuItem,
     Browser,
     SetTrackHeightDialog,
@@ -74,6 +53,16 @@ return declare( JBrowsePlugin,
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;
         var browser = this.browser;
+        console.log(browser);
+        this.config.isAnimal = false;
+        if (browser.config.isAnimal === true || args.config.isAnimal === true){
+            this.config.isAnimal = true;
+        }
+        // if animal, extend new default config functions for MethylPlot and MethylXYPlot
+        if(this.config.isAnimal){
+            lang.extend(MethylPlot, {_defaultConfig: thisB._defaultConfigM});
+        }
+        console.log(this.config);
         browser.afterMilestone( 'initView', function() {
             var navBox = dojo.byId("navbox");
             browser.hideCGButton = new dijitButton(
@@ -86,28 +75,42 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox)); // end cg button
-            
-            browser.hideCHGButton = new dijitButton(
-            {
-                title: "Show/Hide CHG Methylation",
-                id: "hidechg-btn",
-                width: "22px",
-                onClick: dojo.hitch( thisB, function(event) {
-                    browser._showCHGFunction();
-                    dojo.stopEvent(event);
-                })
-            }, dojo.create('button',{},navBox)); // end chg button
-            
-            browser.hideCHHButton = new dijitButton(
-            {
-                title: "Show/Hide CHH Methylation",
-                id: "hidechh-btn",
-                width: "22px",
-                onClick: dojo.hitch( thisB, function(event) {
-                    browser._showCHHFunction();
-                    dojo.stopEvent(event);
-                })
-            }, dojo.create('button',{},navBox)); // end chh button
+            if(thisB.config.isAnimal){
+                // Animal CH
+                browser.hideCHButton = new dijitButton({
+                    title: "Show/Hide CH Methylation",
+                    id: "hidech-btn",
+                    width: "22px",
+                    onClick: dojo.hitch( thisB, function(event) {
+                        browser._showCHFunction();
+                        dojo.stopEvent(event);
+                    })
+                }, dojo.create('button',{},navBox)); // end ch button
+            }
+            else{
+                // Plant CHG and CHH
+                browser.hideCHGButton = new dijitButton(
+                {
+                    title: "Show/Hide CHG Methylation",
+                    id: "hidechg-btn",
+                    width: "22px",
+                    onClick: dojo.hitch( thisB, function(event) {
+                        browser._showCHGFunction();
+                        dojo.stopEvent(event);
+                    })
+                }, dojo.create('button',{},navBox)); // end chg button
+
+                browser.hideCHHButton = new dijitButton(
+                {
+                    title: "Show/Hide CHH Methylation",
+                    id: "hidechh-btn",
+                    width: "22px",
+                    onClick: dojo.hitch( thisB, function(event) {
+                        browser._showCHHFunction();
+                        dojo.stopEvent(event);
+                    })
+                }, dojo.create('button',{},navBox)); // end chh button
+                }
         }); // end after milestone
         
         // need to add option with browser global menus
@@ -170,6 +173,38 @@ return declare( JBrowsePlugin,
             }, 1000);
         }
         
+        browser._showCHFunction = function() {
+            // does the hide/show button exists yet?
+            if (dojo.byId('hidech-btn')==null) return;
+
+            var isShow = true;
+
+            if (dojo.hasAttr(dom.byId("hidech-btn"),"hidden-ch")) {     // if hidden, show
+                dojo.removeAttr(dom.byId("hidech-btn"),"hidden-ch");
+                isShow = true;
+            }else {
+                dojo.attr(dom.byId("hidech-btn"),"hidden-ch","");       // if shown, hide
+                isShow = false;
+            }
+
+            var tracks = browser.view.visibleTracks();
+            array.forEach( tracks, function( track ) {
+                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
+                return;
+                track.config.showCHG = isShow;
+                track.config.showCHH = isShow;
+                track.changed();
+                var mark = registry.byId(track.config.label+'ch-checkbox');
+                if(mark)
+                    mark.set("checked",isShow);
+            });
+            // protect Hide button from clicks durng animation
+            dojo.attr(dom.byId("hidech-btn"),"disabled","");
+            setTimeout(function(){
+                dojo.removeAttr(dom.byId("hidech-btn"),"disabled");
+            }, 1000);
+        }
+
         browser._showCHGFunction = function() {
             // does the hide/show button exists yet?
             if (dojo.byId('hidechg-btn')==null) return;
@@ -231,6 +266,25 @@ return declare( JBrowsePlugin,
                 dojo.removeAttr(dom.byId("hidechh-btn"),"disabled");
             }, 1000);
         }
+    },
+    _defaultConfigM: function(){
+        return Util.deepUpdate(
+            dojo.clone( this.inherited("_defaultConfig",arguments) ),
+            {
+                logScaleOption: false,
+                max_score: 1,
+                min_score: -1,
+                style: {
+                    origin_color: 'gray',
+                    cg_color:'#A36085',
+                    ch_color:'#88C043'
+                },
+                showCG: true,
+                showCHG: true,
+                showCHH: true,
+                isAnimal: true
+            }
+        );
     }
 });
 });

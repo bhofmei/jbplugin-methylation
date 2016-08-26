@@ -53,7 +53,6 @@ return declare( JBrowsePlugin,
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;
         var browser = this.browser;
-        console.log(browser);
         this.config.isAnimal = false;
         if (browser.config.isAnimal === true || args.config.isAnimal === true){
             this.config.isAnimal = true;
@@ -62,7 +61,6 @@ return declare( JBrowsePlugin,
         if(this.config.isAnimal){
             lang.extend(MethylPlot, {_defaultConfig: thisB._defaultConfigM});
         }
-        console.log(this.config);
         browser.afterMilestone( 'initView', function() {
             var navBox = dojo.byId("navbox");
             browser.hideCGButton = new dijitButton(

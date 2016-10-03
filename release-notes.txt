@@ -1,4 +1,7 @@
 Release Notes for Methylation Plugin
+# Version 2.3.1 - Oct 3, 2016
+- fixed issue with track checkbox id's
+
 # Version 2.3.0 - Aug 26, 2016
 - animal-specific coloring
 

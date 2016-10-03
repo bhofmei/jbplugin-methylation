@@ -160,7 +160,7 @@ return declare( JBrowsePlugin,
                 return;
                 track.config.showCG = isShow;
                 track.changed();
-                var mark = registry.byId(track.config.label+'cg-checkbox');
+                var mark = registry.byId(track.config.label+'-cg-checkbox');
                 if(mark)
                     mark.set("checked",isShow);
             });
@@ -192,7 +192,7 @@ return declare( JBrowsePlugin,
                 track.config.showCHG = isShow;
                 track.config.showCHH = isShow;
                 track.changed();
-                var mark = registry.byId(track.config.label+'ch-checkbox');
+                var mark = registry.byId(track.config.label+'-ch-checkbox');
                 if(mark)
                     mark.set("checked",isShow);
             });

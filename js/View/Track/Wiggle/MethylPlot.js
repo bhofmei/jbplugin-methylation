@@ -2,14 +2,16 @@ define( 'MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             'dojo/_base/declare',
             'dojo/_base/array',
             'dojo/_base/Color',
+            'dojo/dom',
             'dojo/dom-construct',
+    "dijit/registry",
             'dojo/on',
             'JBrowse/View/Track/WiggleBase',
             'JBrowse/View/Track/_YScaleMixin',
             'JBrowse/Util',
             'JBrowse/View/Track/Wiggle/_Scale'
         ],
-        function( declare, array, Color, domConstruct, on, WiggleBase, YScaleMixin, Util, Scale ) {
+        function( declare, array, Color, dom, domConstruct, registry, on, WiggleBase, YScaleMixin, Util, Scale ) {
 
 var XYPlot = declare( [WiggleBase, YScaleMixin],
 
@@ -23,7 +25,13 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
  */
 {
     constructor: function() {
+        var thisB = this;
 
+        array.forEach(registry.toArray(),function(x){
+            var i = x.id;
+            if(i.includes(thisB.config.label ) && (/c.*-checkbox/.test(i)))
+                registry.byId(i).destroy();
+        });
     },
 
     _defaultConfig: function() {
@@ -204,7 +212,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCG,
-                    id: track.config.label + '-' + track.refSeq.name + '-cg-checkbox',
+                    id: track.config.label + '-cg-checkbox',
                     class: 'track-cg-checkbox',
                     onClick: function(event) {
                         track.config.showCG = this.checked;
@@ -219,7 +227,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CH Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: (track.config.showCHG && track.config.showCHH),
-                    id: track.config.label + '-' + track.refSeq.name + '-ch-checkbox',
+                    id: track.config.label + '-ch-checkbox',
                     class: 'track-ch-checkbox',
                     onClick: function(event) {
                         track.config.showCHG = this.checked;
@@ -235,7 +243,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CHG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHG,
-                    id: track.config.label + '-' + track.refSeq.name + '-chg-checkbox',
+                    id: track.config.label + '-chg-checkbox',
                     class: 'track-chg-checkbox',
                     onClick: function(event) {
                         track.config.showCHG = this.checked;
@@ -246,7 +254,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CHH Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHH,
-                    id: track.config.label + '-' + track.refSeq.name + '-chh-checkbox',
+                    id: track.config.label + '-chh-checkbox',
                     class: 'track-chh-checkbox',
                     onClick: function(event) {
                         track.config.showCHH = this.checked;

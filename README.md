@@ -8,14 +8,18 @@ this plugin is to be used with whole-genome bisulfite sequencing data. Unlike al
 For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:  
 ``git clone https://github.com/bhofmei/jbplugin-methylation.git MethylationPlugin``
 
+**or**
+
+downloaded the latest release version at [releases](https://github.com/bhofmei/jbplugin-methylation/releases).  
+Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _MethylationPlugin_
+
 ##Activate
-Add this to jbrowse.conf:
+Add this to _jbrowse.conf_ under `[GENERAL]`:
 
-    "plugins": [
-        'MethylationPlugin'
-    ],
+    [ plugins.SmallRNAPlugin ]
+    location = plugins/SmallRNAPlugin
 
-If that doesn't work, add this to jbrowse_conf.json:
+If that doesn't work, add this to _jbrowse_conf.json_:
 
     "plugins" : {
         "MethylationPlugin" : { "location" : "plugins/MethylationPlugin" }

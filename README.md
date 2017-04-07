@@ -1,9 +1,9 @@
-#Methylation Plugin
+# Methylation Plugin
 This is a JBrowse plugin
  
-this plugin is to be used with whole-genome bisulfite sequencing data. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track
+This plugin is to be used with whole-genome bisulfite sequencing data. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track
 
-##Install
+## Install
 
 For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:  
 ``git clone https://github.com/bhofmei/jbplugin-methylation.git MethylationPlugin``
@@ -13,7 +13,7 @@ For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:
 downloaded the latest release version at [releases](https://github.com/bhofmei/jbplugin-methylation/releases).  
 Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _MethylationPlugin_
 
-##Activate
+## Activate
 Add this to _jbrowse.conf_ under `[GENERAL]`:
 
     [ plugins.SmallRNAPlugin ]
@@ -25,14 +25,14 @@ If that doesn't work, add this to _jbrowse_conf.json_:
         "MethylationPlugin" : { "location" : "plugins/MethylationPlugin" }
     }
 
-##Using Methylation Tracks
-###Versions
+## Using Methylation Tracks
+### Versions
 - Version 1 is when all contexts are in a single BigWig file. This caused problems with zooming in the browser, so version 2 was developed as a fix.
 - Version 1 is still supported, but not recommended for use.
 - Version 2 uses three BigWig files, one for each methylation context. The files need the same base name, like _my-file.bw_, and contexts are specified as additional extensions, i.e. _my-file.bw.cg_, _my-file.bw.chg_, and _my-file.bw.chh_.
 - Even for animals, who are interested in CG and CH, use the three contexts specified here. CHG and CHH are combined by the plugin to form CH context.
 
-###File Conversion
+### File Conversion
 The methylation tracks works best when the data is stored as BigWig file(s). File conversion is easy, though. Use the conversion program appropriate to your input file type. 
 _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See details below for acquiring this program.  
 *allC Files*  
@@ -53,7 +53,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
     -p=num_proc     number of processors to use [default 1]  
     -o=outID        optional string to include in output file names
 ~~~~
-*Conversion Version 2:
+* Conversion Version 2:
 ~~~~
      python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
      -keep\t\tkeep intermediate files
@@ -65,7 +65,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
 ~~~~
 Other file types: contact me
 
-###JSON Track Specifications
+### JSON Track Specifications
 Track specifications are very similar to those for XYPlots (see JBrowse tutorial for more information). The _label_, _type_, and _urlTemplate_ must be specified. 
 
 Version 1
@@ -107,10 +107,10 @@ Using the animal coloring scheme is enforced hierarchically. Configurations spec
 
 Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 
-##Future Plans
+## Future Plans
 - corrected global statistics
 
-##Getting bedGraphToBigWig and bedSort
+## Getting bedGraphToBigWig and bedSort
 Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>
 Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>
 Older Linux/Linux server: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v287/

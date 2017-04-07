@@ -1,0 +1,24 @@
+{
+  "name": "jbplugin-methylation",
+  "homepage": "https://github.com/bhofmei/jbplugin-methylation#readme",
+  "description": "JBrowse plugin for viewing DNA methylation",
+  "main": "js/main.js",
+  "keywords": [
+    "jbrowse",
+    "jbrowse-plugin",
+    "methylation"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jasmine-core": "jasmine#^2.4.1",
+    "jbrowse": "git://github.com/GMOD/jbrowse.git#master"
+  }
+}

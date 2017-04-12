@@ -14,11 +14,10 @@
     "node_modules",
     "bower_components",
     "src",
-    "test",
-    "tests"
+    "test"
   ],
   "devDependencies": {
     "jasmine-core": "jasmine#^2.4.1",
-    "jbrowse": "git://github.com/GMOD/jbrowse.git#master"
+    "jbrowse": "git://github.com/GMOD/jbrowse.git#master",
   }
 }

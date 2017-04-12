@@ -111,8 +111,8 @@ Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 - corrected global statistics
 
 ## Getting bedGraphToBigWig and bedSort
-Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>
-Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>
+Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>  
+Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>  
 Older Linux/Linux server: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v287/
 
 - Choose the appropriate web page from above. There will be a long list of programs. 

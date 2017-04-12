@@ -1,4 +1,7 @@
 Release Notes for Methylation Plugin
+# Version 2.3.1 - Apr 12, 2017
+- added testing with jasmine
+
 # Version 2.3.1 - Oct 3, 2016
 - fixed issue with track checkbox id's
 

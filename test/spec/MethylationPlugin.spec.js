@@ -128,5 +128,34 @@ require([
         
     });
     
+   describe( 'non-existant store', function(){
+       var store = new MethylBigWig({
+        browser: new Browser({unitTestMode: true}),
+        urlTemplate: '../data/line1-G3-rep1_Chr1.bw',
+        config:{context:['cg','chg']}
+    });
+    //console.log(JSON.stringify(store));
+    // initialize a store
+    var features = [];
+    var catchError = false;
+    beforeEach(function(done){
+            store.getFeatures({ref:'Chr5', start:1, end: 1000}, function(feature){
+                features.push(feature);
+            }, function(){
+                done();
+            }, function(){
+                catchError = true;
+                done();
+            });
+        });
+    afterEach(function(){
+        features=[];
+    });
+    it('init store', function(){
+            expect(catchError).toEqual(true);
+        });
+
+    });
+
 });
 

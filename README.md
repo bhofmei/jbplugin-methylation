@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/bhofmei/jbplugin-methylation.svg?branch=master)](https://travis-ci.org/bhofmei/jbplugin-methylation)
+
 # Methylation Plugin
 This is a JBrowse plugin
  
@@ -16,8 +18,8 @@ Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _
 ## Activate
 Add this to _jbrowse.conf_ under `[GENERAL]`:
 
-    [ plugins.SmallRNAPlugin ]
-    location = plugins/SmallRNAPlugin
+    [ plugins.MethylationPlugin ]
+    location = plugins/MethylationPlugin
 
 If that doesn't work, add this to _jbrowse_conf.json_:
 

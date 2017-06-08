@@ -25,6 +25,9 @@ If that doesn't work, add this to _jbrowse_conf.json_:
         "MethylationPlugin" : { "location" : "plugins/MethylationPlugin" }
     }
 
+## Test
+Sample data is included in the plugin to test that the plugin is working properly. With `URL` as the URL path to the JBrowse instance, navigate a web browser to `URL/index.html?data=plugins/MethylationPlugin/test/data`.
+
 ## Using Methylation Tracks
 ### Versions
 - Version 1 is when all contexts are in a single BigWig file. This caused problems with zooming in the browser, so version 2 was developed as a fix.

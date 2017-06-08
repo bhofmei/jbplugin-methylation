@@ -8,7 +8,7 @@
          "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-",
          "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
          "label" : "DNA",
-         "category" : "Reference sequence",
+         "category" : "Test data",
          "chunkSize" : 20000
       },
       {
@@ -21,7 +21,17 @@
          "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
          "type" : "FeatureTrack",
          "trackType" : null,
+         "category" : "Test data",
          "label" : "genes"
+      },
+      {
+         "key" : "Wild Type Methylation",
+         "label" : "track_wild_type_methylation",
+         "style" : { "height" : 50 },
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
+         "category" : "Test data"
       }
    ]
 }

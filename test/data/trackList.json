@@ -16,10 +16,10 @@
             "className" : "feature"
          },
          "storeClass" : "JBrowse/Store/SeqFeature/NCList",
-         "key" : "genes",
+         "key" : "Genes",
          "compress" : 0,
          "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
-         "type" : "FeatureTrack",
+         "type" : "JBrowse/View/Track/CanvasFeatures",
          "trackType" : null,
          "category" : "Test data",
          "label" : "genes"

@@ -18,8 +18,8 @@ Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _
 ## Activate
 Add this to _jbrowse.conf_ under `[GENERAL]`:
 
-    [ plugins.SmallRNAPlugin ]
-    location = plugins/SmallRNAPlugin
+    [ plugins.MethylationPlugin ]
+    location = plugins/MethylationPlugin
 
 If that doesn't work, add this to _jbrowse_conf.json_:
 

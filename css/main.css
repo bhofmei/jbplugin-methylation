@@ -66,12 +66,19 @@ span[widgetid=hidech-btn] {
   background-image: url("../img/ch_disabled.png");
 }
 
+tr.track-cg-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
 tr.track-cg-checkbox img.dijitCheckedMenuItemIcon{
     background-image: url("../img/checkmark-cg.png")
 }
+tr.track-ch-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-ch-checkbox img.dijitCheckedMenuItemIcon{
+    background-image: url("../img/checkmark-ch.png")
+}
+tr.track-chg-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
 tr.track-chg-checkbox img.dijitCheckedMenuItemIcon{
     background-image: url("../img/checkmark-chg.png")
 }
+tr.track-chh-checkbox  span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
 tr.track-chh-checkbox img.dijitCheckedMenuItemIcon{
     background-image: url("../img/checkmark-chh.png")
 }

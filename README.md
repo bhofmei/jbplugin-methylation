@@ -1,34 +1,43 @@
-#Methylation Plugin
+[![Build Status](https://travis-ci.org/bhofmei/jbplugin-methylation.svg?branch=master)](https://travis-ci.org/bhofmei/jbplugin-methylation)
+
+# Methylation Plugin
 This is a JBrowse plugin
  
-this plugin is to be used with whole-genome bisulfite sequencing data. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track
+This plugin is to be used with whole-genome bisulfite sequencing data. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track
 
-##Install
+## Install
 
 For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:  
 ``git clone https://github.com/bhofmei/jbplugin-methylation.git MethylationPlugin``
 
-##Activate
-Add this to jbrowse.conf:
+**or**
 
-    "plugins": [
-        'MethylationPlugin'
-    ],
+downloaded the latest release version at [releases](https://github.com/bhofmei/jbplugin-methylation/releases).  
+Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _MethylationPlugin_
 
-If that doesn't work, add this to jbrowse_conf.json:
+## Activate
+Add this to _jbrowse.conf_ under `[GENERAL]`:
+
+    [ plugins.MethylationPlugin ]
+    location = plugins/MethylationPlugin
+
+If that doesn't work, add this to _jbrowse_conf.json_:
 
     "plugins" : {
         "MethylationPlugin" : { "location" : "plugins/MethylationPlugin" }
     }
 
-##Using Methylation Tracks
-###Versions
+## Test
+Sample data is included in the plugin to test that the plugin is working properly. With `URL` as the URL path to the JBrowse instance, navigate a web browser to `URL/index.html?data=plugins/MethylationPlugin/test/data`.
+
+## Using Methylation Tracks
+### Versions
 - Version 1 is when all contexts are in a single BigWig file. This caused problems with zooming in the browser, so version 2 was developed as a fix.
 - Version 1 is still supported, but not recommended for use.
 - Version 2 uses three BigWig files, one for each methylation context. The files need the same base name, like _my-file.bw_, and contexts are specified as additional extensions, i.e. _my-file.bw.cg_, _my-file.bw.chg_, and _my-file.bw.chh_.
 - Even for animals, who are interested in CG and CH, use the three contexts specified here. CHG and CHH are combined by the plugin to form CH context.
 
-###File Conversion
+### File Conversion
 The methylation tracks works best when the data is stored as BigWig file(s). File conversion is easy, though. Use the conversion program appropriate to your input file type. 
 _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See details below for acquiring this program.  
 *allC Files*  
@@ -49,7 +58,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
     -p=num_proc     number of processors to use [default 1]  
     -o=outID        optional string to include in output file names
 ~~~~
-*Conversion Version 2:
+* Conversion Version 2:
 ~~~~
      python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
      -keep\t\tkeep intermediate files
@@ -61,7 +70,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
 ~~~~
 Other file types: contact me
 
-###JSON Track Specifications
+### JSON Track Specifications
 Track specifications are very similar to those for XYPlots (see JBrowse tutorial for more information). The _label_, _type_, and _urlTemplate_ must be specified. 
 
 Version 1
@@ -76,6 +85,7 @@ Version 1
     }
     
 Version 2
+
 _urlTemplate_ is the path and filename up-to, but not including, the context-specific extension. For example `"urlTemplate" : "path/my-file.bw"` from example above.
 
     {  
@@ -86,14 +96,28 @@ _urlTemplate_ is the path and filename up-to, but not including, the context-spe
         "urlTemplate" : "path/to/bigwig_file.bw",
         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot"
     }
+If there is not a file for all contexts (CG, CHG, and CHH), include the following in the track configuration and specify only the contexts needed. 
+    
+### Animal-specific coloring
+While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see above).
 
-##Future Plans
-- Animal-specific methylation coloring (CG and CH vs CG, CHG, CHH)
+Using the animal coloring scheme is enforced hierarchically. Configurations specified at a higher level overpower lower-level specification. If not specified at a specific level, inherits the setting of the level below. 
+
+| level| location | syntax|
+|--|--|--|
+|*highest* | individual track config | `isAnimal=true` |
+| | `tracks.conf` | `[general]`<br>`isAnimal=true` |
+| | `jbrowse.conf` | `[general]` <br> `isAnimal=true` |
+|*lowest*| **default** | `isAnimal=false`|
+
+Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
+
+## Future Plans
 - corrected global statistics
 
-##Getting bedGraphToBigWig and bedSort
-Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>
-Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>
+## Getting bedGraphToBigWig and bedSort
+Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>  
+Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>  
 Older Linux/Linux server: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v287/
 
 - Choose the appropriate web page from above. There will be a long list of programs. 

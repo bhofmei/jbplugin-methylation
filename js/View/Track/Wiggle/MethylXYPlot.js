@@ -30,9 +30,6 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         	this.config.style.chg_color = '#0072B2';
         if (typeof(this.config.style.chh_color) == "undefined")
         	this.config.style.chh_color = '#CF8F00';
-        this.config.showCG = true;
-        this.config.showCHG = true;
-        this.config.showCHH = true;
         //console.log('methylxyplot2 constructor');
     },
 
@@ -46,6 +43,9 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 style: {
                     origin_color: 'gray'
                 },
+                showCG: true,
+                showCHG: true,
+                showCHH: true
             }
         );
     },
@@ -205,7 +205,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCG,
-                    id: track.config.label +'cg-checkbox',
+                    id: track.config.label + '-' + track.refSeq.name + '-cg-checkbox',
                     class: 'track-cg-checkbox',
                     onClick: function(event) {
                         console.log(this);
@@ -217,7 +217,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CHG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHG,
-                    id: track.config.label +'chg-checkbox',
+                    id: track.config.label + '-' + track.refSeq.name +'-chg-checkbox',
                     class: 'track-chg-checkbox',
                     onClick: function(event) {
                         track.config.showCHG = this.checked;
@@ -228,7 +228,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CHH Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHH,
-                    id: track.config.label +'chh-checkbox',
+                    id: track.config.label + '-' + track.refSeq.name + '-chh-checkbox',
                     class: 'track-chh-checkbox',
                     onClick: function(event) {
                         track.config.showCHH = this.checked;

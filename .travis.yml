@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+    - 7
+sudo: false
+cache:
+  directories:
+  - $HOME/.cache/bower
+before_install:
+  - pip install --user RangeHTTPServer
+  - npm install -g bower
+install:
+  - bower install
+before_script:
+  - python -m RangeHTTPServer &
+script:
+  - phantomjs test/run-jasmine.js http://localhost:8000/test/

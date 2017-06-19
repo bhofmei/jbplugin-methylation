@@ -26,12 +26,14 @@ return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
      */
     constructor: function( args ) {
         var thisB = this;
-        var methylationTypes = ['cg','chg','chh'];
-        //var methylationTypes = ['chh','chg','cg'];
-        var newFiles = array.map(methylationTypes,function(m){
+        if(args.config.context === undefined){
+            this.config.context = ['cg','chg','chh'];
+        }else{
+            this.config.context = array.map(args.config.context, function(x){return x.toLowerCase()})
+        }
+        var newFiles = array.map(thisB.config.context,function(m){
             return {url: args.urlTemplate + '.' + m, name: m};
         });
-        //console.log(newFiles);
         this.stores = array.map( newFiles, function( n ) {
             return new BigWig( dojo.mixin(args, {urlTemplate: n.url, name: n.name}) );
         });
@@ -43,7 +45,7 @@ return declare([ SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin ],
             thisB._deferred.features.resolve({success: true});
             thisB._deferred.stats.resolve({success: true});
             thisB._checkZoomLevels();
-            console.log(thisB.stores);
+            //console.log(thisB.stores);
         },
         lang.hitch( this, '_failAllDeferred' ));
         //console.log(this.stores);

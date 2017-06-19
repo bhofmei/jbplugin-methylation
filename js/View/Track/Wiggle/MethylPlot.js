@@ -2,14 +2,16 @@ define( 'MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             'dojo/_base/declare',
             'dojo/_base/array',
             'dojo/_base/Color',
+            'dojo/dom',
             'dojo/dom-construct',
+    "dijit/registry",
             'dojo/on',
             'JBrowse/View/Track/WiggleBase',
             'JBrowse/View/Track/_YScaleMixin',
             'JBrowse/Util',
             'JBrowse/View/Track/Wiggle/_Scale'
         ],
-        function( declare, array, Color, domConstruct, on, WiggleBase, YScaleMixin, Util, Scale ) {
+        function( declare, array, Color, dom, domConstruct, registry, on, WiggleBase, YScaleMixin, Util, Scale ) {
 
 var XYPlot = declare( [WiggleBase, YScaleMixin],
 
@@ -23,17 +25,13 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
  */
 {
     constructor: function() {
+        var thisB = this;
 
-        if (typeof(this.config.style.cg_color) == "undefined")
-        	this.config.style.cg_color = '#A36085';
-        if (typeof(this.config.style.chg_color) == "undefined")
-        	this.config.style.chg_color = '#0072B2';
-        if (typeof(this.config.style.chh_color) == "undefined")
-        	this.config.style.chh_color = '#CF8F00';
-        this.config.showCG = true;
-        this.config.showCHG = true;
-        this.config.showCHH = true;
-        //console.log('methylxyplot2 constructor');
+        array.forEach(registry.toArray(),function(x){
+            var i = x.id;
+            if(i.includes(thisB.config.label ) && (/c.*-checkbox/.test(i)))
+                registry.byId(i).destroy();
+        });
     },
 
     _defaultConfig: function() {
@@ -44,8 +42,15 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 max_score: 1,
                 min_score: -1,
                 style: {
-                    origin_color: 'gray'
+                    origin_color: 'gray',
+                    cg_color:'#A36085',
+                    chg_color:'#0072B2',
+                    chh_color:'#CF8F00'
                 },
+                showCG: true,
+                showCHG: true,
+                showCHH: true,
+                isAnimal: false
             }
         );
     },
@@ -198,6 +203,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
     _trackMenuOptions: function() {
         var options = this.inherited(arguments);
         var track = this;
+        //console.log(track);
         options.push.apply(
             options,
             [
@@ -206,19 +212,38 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCG,
-                    id: track.config.label +'cg-checkbox',
+                    id: track.config.label + '-cg-checkbox',
                     class: 'track-cg-checkbox',
                     onClick: function(event) {
-                        console.log(this);
                         track.config.showCG = this.checked;
                         track.changed();
                     }
-                },
-                {
+                }
+            ]);
+        if(this.config.isAnimal){
+            options.push.apply(
+            options,
+            [{
+                    label: 'Show CH Methylation',
+                    type: 'dijit/CheckedMenuItem',
+                    checked: (track.config.showCHG && track.config.showCHH),
+                    id: track.config.label + '-ch-checkbox',
+                    class: 'track-ch-checkbox',
+                    onClick: function(event) {
+                        track.config.showCHG = this.checked;
+                        track.config.showCHH = this.checked;
+                        track.changed();
+                    }
+                }
+            ]);
+        } else {
+            options.push.apply(
+            options,
+            [ {
                     label: 'Show CHG Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHG,
-                    id: track.config.label +'chg-checkbox',
+                    id: track.config.label + '-chg-checkbox',
                     class: 'track-chg-checkbox',
                     onClick: function(event) {
                         track.config.showCHG = this.checked;
@@ -229,7 +254,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show CHH Methylation',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showCHH,
-                    id: track.config.label +'chh-checkbox',
+                    id: track.config.label + '-chh-checkbox',
                     class: 'track-chh-checkbox',
                     onClick: function(event) {
                         track.config.showCHH = this.checked;
@@ -237,8 +262,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     }
                 }
             ]);
-
-
+        }
         return options;
     },
     
@@ -247,9 +271,11 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
     _isShown: function( id ){
         if( id == 'cg')
             return this.config.showCG;
+        else if(this.config.isAnimal) // ch
+            return (this.config.showCHG && this.config.showCHH)
         else if (id == 'chg')
             return this.config.showCHG;
-        else if( id== 'chh' )
+        else if( id == 'chh' )
             return this.config.showCHH;
         else
             return false;
@@ -258,9 +284,11 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
     _getConfigColor: function(id) {
         if( id == 'cg' )
             return this.config.style.cg_color;
+        else if(this.config.isAnimal) // ch
+            return this.config.style.ch_color;
         else if( id == 'chg' )
             return this.config.style.chg_color;
-        else if( id = 'chh' )
+        else if( id == 'chh' )
             return this.config.style.chh_color;
         else
             return 'black';
@@ -271,8 +299,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
         var color = new Color(this._getConfigColor(id));
         color.a = 0.8;
         return color.toString();
-    } 
-
+    }
 });
 
 return XYPlot;

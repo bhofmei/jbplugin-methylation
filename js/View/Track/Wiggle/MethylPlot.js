@@ -32,6 +32,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
             if(i.includes(thisB.config.label ) && (/c.*-checkbox/.test(i)))
                 registry.byId(i).destroy();
         });
+
     },
 
     _defaultConfig: function() {
@@ -39,6 +40,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
             dojo.clone( this.inherited(arguments) ),
             {
                 logScaleOption: false,
+                methylatedOption: false,
                 max_score: 1,
                 min_score: -1,
                 style: {
@@ -50,6 +52,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 showCG: true,
                 showCHG: true,
                 showCHH: true,
+                showMethylatedOnly: false,
                 isAnimal: false
             }
         );
@@ -161,13 +164,21 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
             var fRect = pair.featureRect;
             var score = f.get('score');
             var id = f.get('source');
-            //var scoreID = this._getScoreInfo( tmpScore );
-            //var score = scoreID[0];
-            //var id = scoreID[1];
+            var isMethylated;
+            if( config.methylatedOption ){
+                if( f.get('methylated')===undefined){
+                    isMethylated= this._getScoreInfo( score );
+                    f.set('methylated', isMethylated);
+                } else {
+                    isMethylated = f.get('methylated');
+                }
+            }else{
+                isMethylated = true;
+            }
 
             fRect.t = toY( score );
             //console.log(fRect.t+','+canvasHeight);
-            if( fRect.t <= canvasHeight && this._isShown(id) ) { // if the rectangle is visible at all
+            if( fRect.t <= canvasHeight && this._isShown(id, isMethylated) ) { // if the rectangle is visible at all
                 context.fillStyle = this._getFeatureColor(id);
                 if (fRect.t <= originY) // bar goes upward
                     context.fillRect( fRect.l, fRect.t, fRect.w, originY-fRect.t+1);
@@ -263,12 +274,86 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 }
             ]);
         }
+        if(this.config.methylatedOption){
+          options.push.apply(
+            options,
+            [
+                {
+                    label: 'Show Methylated Sites Only',
+                    type: 'dijit/CheckedMenuItem',
+                    checked: track.config.showMethylatedOnly,
+                    //id: track.config.label + '-cg-checkbox',
+                    //class: 'track-cg-checkbox',
+                    onClick: function(event) {
+                        track.config.showMethylatedOnly = this.checked;
+                        track.changed();
+                    }
+                }
+            ]);
+        }
         return options;
     },
     
+    _calculatePixelScores: function( canvasWidth, features, featureRects ) {
+        var thisB = this;
+        var scoreType = this.config.scoreType;
+        var pixelValues = new Array( canvasWidth );
+        // make an array of the max score at each pixel on the canvas
+        dojo.forEach( features, function( f, i ) {
+            var store = f.source;
+            var id = f.get('source');
+            var isMethylated;
+            var score = f.get(scoreType)||f.get('score');
+            if( thisB.config.methylatedOption ){
+                if( f.get('methylated')===undefined){
+                    isMethylated= thisB._getScoreInfo( score );
+                    f.set('methylated', isMethylated);
+                } else {
+                    isMethylated = f.get('methylated');
+                }
+            }else{
+                isMethylated = true;
+            }
+            var isShown = thisB._isShown(id, isMethylated);
+            if(!isShown)
+                return;
+            var fRect = featureRects[i];
+            var jEnd = fRect.r;
+            for( var j = Math.round(fRect.l); j < jEnd; j++ ) {
+                if ( pixelValues[j] && pixelValues[j]['lastUsedStore'] == store ) {
+                    /* Note: if the feature is from a different store, the condition should fail,
+                     *       and we will add to the value, rather than adjusting for overlap */
+                    pixelValues[j]['score'] = Math.max( pixelValues[j]['score'], score );
+                }
+                else if ( pixelValues[j] ) {
+                    pixelValues[j]['score'] = pixelValues[j]['score'] + score;
+                    pixelValues[j]['lastUsedStore'] = store;
+                }
+                else {
+                    pixelValues[j] = { score: score, lastUsedStore: store, feat: f };
+                }
+            }
+        },this);
+        // when done looping through features, forget the store information.
+        for (var i=0; i<pixelValues.length; i++) {
+            if ( pixelValues[i] ) {
+                delete pixelValues[i]['lastUsedStore'];
+            }
+        }
+        return pixelValues;
+    },
+
+    _getScoreInfo: function(inputScore){
+        var flStr = inputScore.toFixed(7);
+        var isMethylated = parseInt(flStr.charAt(flStr.length-1))
+        return isMethylated;
+    },
     
     /* determine if the methylation context is shown to save time when drawing */
-    _isShown: function( id ){
+    _isShown: function( id, isMethylated ){
+        if (this.config.showMethylatedOnly && !isMethylated){
+            return false;
+        }
         if( id == 'cg')
             return this.config.showCG;
         else if(this.config.isAnimal) // ch

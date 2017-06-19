@@ -1,4 +1,15 @@
 Release Notes for Methylation Plugin
+
+# Version 3.0.0 - Jun 19, 2017
+
+- Updated MethylPlot with a "ShowMethylatedOnly" option, when checked, it only shows "methylated" sites
+    - Methylated sites are determined by the value in the bigwig file
+    - Methylated sites have "1" in the 7th decimal position; unmethylated sites have "0"
+    - This only works when bigwig files have been converted using `allc_to_bigwig_pe_v3.py" option
+    - When this option is used for bigwig files converted with a different script, results will be incorrect.
+- For tracks converted with "allc_to_bigwig_pe_v3.py", use the "methylatedOption = true" in the configuration file.
+- Also updated to score mouseover score values are only shown for visible sites
+
 # Version 2.3.1 - Apr 12, 2017
 - added testing with jasmine
 

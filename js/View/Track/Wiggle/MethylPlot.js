@@ -52,7 +52,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                 showCG: true,
                 showCHG: true,
                 showCHH: true,
-                showMethylatedOnly: false,
+                showMethylatedOnly: true,
                 isAnimal: false
             }
         );

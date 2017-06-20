@@ -1,37 +1,43 @@
 {
-   "formatVersion" : 1,
+   "names" : {
+      "type" : "Hash",
+      "url" : "names/"
+   },
    "tracks" : [
       {
          "seqType" : "dna",
-         "key" : "Reference sequence",
          "type" : "SequenceTrack",
-         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-",
          "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
          "label" : "DNA",
-         "category" : "Test data",
-         "chunkSize" : 20000
+         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-",
+         "key" : "Reference sequence",
+         "chunkSize" : 20000,
+         "category" : "Test data"
       },
       {
+         "trackType" : null,
+         "label" : "genes",
+         "compress" : 0,
+         "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
+         "category" : "Test data",
+         "key" : "Genes",
+         "type" : "JBrowse/View/Track/CanvasFeatures",
          "style" : {
             "className" : "feature"
          },
-         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
-         "key" : "Genes",
-         "compress" : 0,
-         "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
-         "type" : "JBrowse/View/Track/CanvasFeatures",
-         "trackType" : null,
-         "category" : "Test data",
-         "label" : "genes"
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList"
       },
       {
+         "style" : {
+            "height" : 50
+         },
+         "category" : "Test data",
          "key" : "Wild Type Methylation",
-         "label" : "track_wild_type_methylation",
-         "style" : { "height" : 50 },
-         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
-         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
-         "category" : "Test data"
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "label" : "track_wild_type_methylation",
+         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw"
       }
-   ]
+   ],
+   "formatVersion" : 1
 }

@@ -29,7 +29,6 @@ If that doesn't work, add this to _jbrowse_conf.json_:
 
 ## Test
 Sample data is included in the plugin to test that the plugin is working properly. With `URL` as the URL path to the JBrowse instance, navigate a web browser to `URL/index.html?data=plugins/MethylationPlugin/test/data`.
-**Note:** test data is for v2 tracks but will be updated soon
 
 ## Using Methylation Tracks
 ### Versions

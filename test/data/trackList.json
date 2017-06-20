@@ -1,31 +1,45 @@
 {
+   "formatVersion" : 1,
    "names" : {
       "type" : "Hash",
       "url" : "names/"
    },
    "tracks" : [
       {
-         "seqType" : "dna",
-         "type" : "SequenceTrack",
-         "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
-         "label" : "DNA",
-         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-",
          "key" : "Reference sequence",
+         "seqType" : "dna",
+         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-",
+         "category" : "Test data",
          "chunkSize" : 20000,
-         "category" : "Test data"
+         "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
+         "type" : "SequenceTrack",
+         "label" : "DNA"
       },
       {
-         "trackType" : null,
-         "label" : "genes",
+         "key" : "genes",
          "compress" : 0,
-         "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
          "category" : "Test data",
-         "key" : "Genes",
+         "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
          "type" : "JBrowse/View/Track/CanvasFeatures",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
          "style" : {
-            "className" : "feature"
+            "className" : "feature",
+            "color" : "#daa520"
          },
-         "storeClass" : "JBrowse/Store/SeqFeature/NCList"
+         "label" : "genes"
+      },
+      {
+         "label" : "tes",
+         "key" : "tes",
+         "compress" : 0,
+         "category" : "Test data",
+         "urlTemplate" : "tracks/tes/{refseq}/trackData.json",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "style" : {
+            "className" : "feature",
+            "color" : "#77158D"
+         },
+         "type" : "JBrowse/View/Track/CanvasFeatures"
       },
       {
          "style" : {
@@ -33,11 +47,11 @@
          },
          "category" : "Test data",
          "key" : "Wild Type Methylation",
+         "methylatedOption" : true,
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "label" : "track_wild_type_methylation",
-         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw"
+         "urlTemplate" : "test_methyl_short_v3.bw"
       }
-   ],
-   "formatVersion" : 1
+   ]
 }

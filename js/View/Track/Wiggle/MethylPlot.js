@@ -29,7 +29,8 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
 
         array.forEach(registry.toArray(),function(x){
             var i = x.id;
-            if(i.includes(thisB.config.label ) && (/c.*-checkbox/.test(i)))
+
+            if(i !== undefined) && (i.includes(thisB.config.label ) && (/c.*-checkbox/.test(i)))
                 registry.byId(i).destroy();
         });
 

@@ -1,4 +1,7 @@
 Release Notes for Methylation Plugin
+# Version 3.0.2 - Jul 13, 2017
+- Fixed error where the String method "includes" was not being supported by phantomJS
+
 # Version 3.0.1 - Jun 20, 2017
 - Changed default of MethylPlot to only show methylated positions by default
 - Added print statement to plugin constructor

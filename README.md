@@ -182,6 +182,7 @@ Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 ## Future Plans
 - corrected global statistics
 - improved documentation for the different versions
+- Complimentary track style with HTML features, which will be useful for screenshots
 
 ## Getting bedGraphToBigWig and bedSort
 Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>  

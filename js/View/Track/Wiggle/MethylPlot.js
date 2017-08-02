@@ -29,7 +29,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
 
         array.forEach(registry.toArray(),function(x){
             var i = x.id;
-            if(i !== undefined && ( i.indexOf(thisB.config.label) >=0 ) && (/c.*-checkbox/.test(i)))
+            if(i !== undefined && ( i.indexOf(thisB.config.label) >=0 ) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i)))
                 registry.byId(i).destroy();
         });
 
@@ -282,7 +282,7 @@ var XYPlot = declare( [WiggleBase, YScaleMixin],
                     label: 'Show Methylated Sites Only',
                     type: 'dijit/CheckedMenuItem',
                     checked: track.config.showMethylatedOnly,
-                    id: track.config.label + '-methylated',
+                    id: track.config.label + '-methylated-checkbox',
                     //class: 'track-cg-checkbox',
                     onClick: function(event) {
                         track.config.showMethylatedOnly = this.checked;

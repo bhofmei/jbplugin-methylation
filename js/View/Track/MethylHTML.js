@@ -25,19 +25,19 @@ define("MethylationPlugin/View/Track/MethylHTML", [
 
     return declare([HTMLFeatures], {
 
-      constructor: function (arguments) {},
+      constructor: function (arguments) {
+        //this.maxFeatHeight = this.config.style.height / 2.0;
+      },
 
       _defaultConfig: function () {
         var thisB = this;
         var c = Util.deepUpdate(
           dojo.clone(this.inherited(arguments)), {
-            maxFeatureScreenDensity: 6,
             showCG: true,
             showCHG: true,
             showCHH: true,
             showMethylatedOnly: false,
             maxHeight: 100,
-
             style: {
               _defaultLabelScale: 50,
               className: 'methyl',
@@ -47,7 +47,7 @@ define("MethylationPlugin/View/Track/MethylHTML", [
               showSubfeatures: false,
               showLabels: false,
               clip_marker: false,
-              minSubfeatureWidth: 0,
+              minSubfeatureWidth: 0
             }
           }
         );
@@ -60,7 +60,7 @@ define("MethylationPlugin/View/Track/MethylHTML", [
           // if no layoutPitchY configured, calculate it from the
           // height and marginBottom (parseInt in case one or both are functions), or default to 3 if the
           // calculation didn't result in anything sensible.
-          var pitchY = this.getConf('layoutPitchY') || 4;
+          var pitchY = this.getConf('layoutPitchY') || 1;
           this.layout = new Layout({
             pitchX: 4 / scale,
             pitchY: pitchY,
@@ -184,16 +184,18 @@ define("MethylationPlugin/View/Track/MethylHTML", [
 
         //var levelHeight = this.glyphHeight + this.glyphHeightPad;
         var levelHeight = (this.getConf('maxHeight')/2.0) * score * strand;
+        //var levelHeight = 1;
 
         layoutEnd += Math.max(1, this.padding / scale);
         uniqueId = featureStart + '-' + featureEnd + '-' + feature.get('source');
-        var top = this._getLayout(scale)
+        var layoutData = this._getLayout(scale)
           .addRect(uniqueId,
             layoutStart,
             layoutEnd,
             levelHeight,
             feature);
-
+        var top = layoutData.top;
+        var featHeight = layoutData.height;
         if (top === null || top === undefined) {
           // could not lay out, would exceed our configured maxHeight
           // mark the block as exceeding the max height
@@ -235,23 +237,6 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         domClass.add(featDiv, "feature");
         var className = this.config.style.className;
         domClass.add(featDiv, className);
-        /*var seqLen = feature.get('seq_length');
-        // pi rnas
-        if (seqLen > 25 && seqLen < 32 && this.config.isAnimal)
-          domClass.add(featDiv, 'smrna-' + 'pi');
-        // other
-        else if (seqLen < 21 || seqLen >= 25)
-          domClass.add(featDiv, 'smrna-' + 'other');
-        // otherwise it's fine
-        else
-          domClass.add(featDiv, 'smrna-' + seqLen);
-
-
-        // check multimapping
-        if (feature.get('supplementary_alignment') || (typeof feature.get('xm') != 'undefined' && feature.get('xm') > 1) || (typeof feature.get('nh') != 'undefined' && feature.get('nh') > 1)) {
-          if (!this.config.style.solidFill)
-            domClass.add(featDiv, 'multimapped');
-        }*/
 
         // Since some browsers don't deal well with the situation where
         // the feature goes way, way offscreen, we truncate the feature
@@ -262,11 +247,13 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         var displayStart = Math.max(featureStart, containerStart);
         var displayEnd = Math.min(featureEnd, containerEnd);
         var blockWidth = block.endBase - block.startBase;
+        //var featheight = 100*((this.getConf('maxHeight')/2.0) * score * strand) / (this.getConf('maxHeight'));
         var featwidth = Math.max(this.minFeatWidth, (100 * ((displayEnd - displayStart) / blockWidth)));
         featDiv.style.cssText =
           "left:" + (100 * (displayStart - block.startBase) / blockWidth) + "%;" +
           "top:" + top + "px;" +
           " width:" + featwidth + "%;" +
+          " height:" +  Math.min(featHeight, 50) + "px;" +
           (this.config.style.featureCss ? this.config.style.featureCss : "");
 
         // Store the containerStart/End so we can resolve the truncation
@@ -283,6 +270,114 @@ define("MethylationPlugin/View/Track/MethylHTML", [
 
         return featDiv;
       },
+      /*renderFeature: function (feature, uniqueId, block, scale, containerStart, containerEnd) {
+
+        var featureEnd = feature.get('end');
+        var featureStart = feature.get('start');
+        if (typeof featureEnd == 'string')
+          featureEnd = parseInt(featureEnd);
+        if (typeof featureStart == 'string')
+          featureStart = parseInt(featureStart);
+        // layoutStart: start genome coord (at current scale) of horizontal space need to render feature,
+        //       including decorations (arrowhead, label, etc) and padding
+        var layoutStart = featureStart;
+        // layoutEnd: end genome coord (at current scale) of horizontal space need to render feature,
+        //       including decorations (arrowhead, label, etc) and padding
+        var layoutEnd = featureEnd;
+
+        var score = feature.get('score');
+        var strand = (score >= 0 ? 1 : -1);
+        feature.set('strand', strand);
+
+        //var levelHeight = this.glyphHeight + this.glyphHeightPad;
+        var levelHeight = (this.getConf('maxHeight')/2.0) * score * strand;
+        var featHeight = (this.getConf('height')/2) * score * strand;
+
+
+        var featDiv = this.config.hooks.create(this, feature);
+        this._connectFeatDivHandlers(featDiv);
+        // NOTE ANY DATA SET ON THE FEATDIV DOM NODE NEEDS TO BE
+        // MANUALLY DELETED IN THE cleanupBlock METHOD BELOW
+        featDiv.track = this;
+        featDiv.feature = feature;
+        featDiv.layoutEnd = layoutEnd;
+
+        // border values used in positioning boolean subfeatures, if any.
+        featDiv.featureEdges = {
+          s: Math.max(featDiv.feature.get('start'), containerStart),
+          e: Math.min(featDiv.feature.get('end'), containerEnd)
+        };
+
+        // (callbackArgs are the args that will be passed to callbacks
+        // in this feature's context menu or left-click handlers)
+        featDiv.callbackArgs = [this, featDiv.feature, featDiv];
+
+
+        block.featureNodes[uniqueId] = featDiv;
+
+        // record whether this feature protrudes beyond the left and/or right side of the block
+        if (layoutStart < block.startBase) {
+          if (!block.leftOverlaps) block.leftOverlaps = [];
+          block.leftOverlaps.push(uniqueId);
+        }
+        if (layoutEnd > block.endBase) {
+          if (!block.rightOverlaps) block.rightOverlaps = [];
+          block.rightOverlaps.push(uniqueId);
+        }
+        // update
+        domClass.add(featDiv, "feature");
+        var className = this.config.style.className;
+        domClass.add(featDiv, className);
+        var seqLen = feature.get('seq_length');
+        // pi rnas
+        if (seqLen > 25 && seqLen < 32 && this.config.isAnimal)
+          domClass.add(featDiv, 'smrna-' + 'pi');
+        // other
+        else if (seqLen < 21 || seqLen >= 25)
+          domClass.add(featDiv, 'smrna-' + 'other');
+        // otherwise it's fine
+        else
+          domClass.add(featDiv, 'smrna-' + seqLen);
+
+
+        // check multimapping
+        if (feature.get('supplementary_alignment') || (typeof feature.get('xm') != 'undefined' && feature.get('xm') > 1) || (typeof feature.get('nh') != 'undefined' && feature.get('nh') > 1)) {
+          if (!this.config.style.solidFill)
+            domClass.add(featDiv, 'multimapped');
+        }
+
+        // Since some browsers don't deal well with the situation where
+        // the feature goes way, way offscreen, we truncate the feature
+        // to exist betwen containerStart and containerEnd.
+        // To make sure the truncated end of the feature never gets shown,
+        // we'll destroy and re-create the feature (with updated truncated
+        // boundaries) in the transfer method.
+        var displayStart = Math.max(featureStart, containerStart);
+        var displayEnd = Math.min(featureEnd, containerEnd);
+        var blockWidth = block.endBase - block.startBase;
+        var featheight = 100*((this.getConf('maxHeight')/2.0) * score * strand) / (this.getConf('maxHeight'));
+        var featwidth = Math.max(this.minFeatWidth, (100 * ((displayEnd - displayStart) / blockWidth)));
+        featDiv.style.cssText =
+          "left:" + (100 * (displayStart - block.startBase) / blockWidth) + "%;" +
+          "top:" + top + "px;" +
+          " width:" + featwidth + "%;" +
+          " height:" +  Math.min(featheight, 50) + "%;" +
+          (this.config.style.featureCss ? this.config.style.featureCss : "");
+
+        // Store the containerStart/End so we can resolve the truncation
+        // when we are updating static elements
+        featDiv._containerStart = containerStart;
+        featDiv._containerEnd = containerEnd;
+
+        // fill in the template parameters in the featDiv and also for the labelDiv (see below)
+        var context = lang.mixin({
+          track: this,
+          feature: feature,
+          callbackArgs: [this, feature]
+        });
+
+        return featDiv;
+      },*/
 
       addFeatureToBlock: function (feature, uniqueId, block, scale,
         containerStart, containerEnd) {

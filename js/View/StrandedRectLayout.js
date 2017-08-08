@@ -49,11 +49,11 @@ define("MethylationPlugin/View/StrandedRectLayout", [
 
           // add it to the bitmap again, since that bitmap range may have been discarded
           this._addRectToBitmap(storedRec, data);
-          return storedRec.top * this.pitchY;
+          return {top: storedRec.top * this.pitchY, height: storedRec.h * this.pitchY};
         }
 
         var pLeft = Math.floor(left / this.pitchX);
-        var pRight = Math.floor(right / this.pitchX)-1;
+        var pRight = Math.floor(right / this.pitchX);
         var pHeight = Math.ceil(height / this.pitchY);
 
         var midX = Math.floor((pLeft + pRight) / 2);
@@ -65,28 +65,32 @@ define("MethylationPlugin/View/StrandedRectLayout", [
           h: pHeight
         };
         var strand = 0;
-        if (data)
+        if (data){
           rectangle.data = data;
         strand = data.data.strand;
+        }
         //console.log(JSON.stringify(rectangle.data.data));
-        var top = this.originY;// - 1;
-        var topStart;
+        //var top = this.originY - 1;
+        //var topStart;
+        var top;
         // negative strand
         if (strand == -1) {
-          var maxTopNeg = this.maxHeight - pHeight;
-          topStart = this.originY; // + 2; //(this.displayMode == 'compact' ? 2 : 1);
+          /*var maxTopNeg = this.maxHeight - pHeight;
+          topStart = this.originY + 2; //(this.displayMode == 'compact' ? 2 : 1);
           for (top = topStart; top <= maxTopNeg; top++) {
             if (!(this._collides(rectangle, top)))
               break;
-          }
+          }*/
+          top = this.originY;
         } else if (strand == 1) {
           // positive strand
-          var maxTopPos = 0;
-          topStart = this.originY - pHeight; // - 2; //(this.displayMode == 'compact' ? 2 : 1);
+          /*var maxTopPos = 0;
+          topStart = this.originY - pHeight - 2; //(this.displayMode == 'compact' ? 2 : 1);
           for (top = topStart; top >= maxTopPos; top = top - pHeight) {
             if (!this._collides(rectangle, top))
               break;
-          }
+          }*/
+          top = this.originY - pHeight;
         }
         // this must change
         /*var maxTop = this.maxHeight - pHeight;
@@ -94,18 +98,18 @@ define("MethylationPlugin/View/StrandedRectLayout", [
             if( ! this._collides( rectangle, top ) )
                 break;
         }*/
-        if ((strand == -1 && top > maxTopNeg) || (strand == 1 && top < maxTopPos)) {
+        /*if ((strand == -1 && top > maxTopNeg) || (strand == 1 && top < maxTopPos)) {
           rectangle.top = top = (strand === -1 ? null : undefined);
           this.rectangles[id] = rectangle;
           this.pTotalHeight = Math.max(this.pTotalHeight || 0, top + pHeight);
           return (strand === -1 ? null : undefined);
-        } else {
+        } else {*/
           rectangle.top = top;
           this._addRectToBitmap(rectangle, data);
           this.rectangles[id] = rectangle;
-          this.pTotalHeight = Math.max(this.pTotalHeight || 0, top + pHeight);
-          return top * this.pitchY;
-        }
+          //this.pTotalHeight = Math.max(this.pTotalHeight || 0, top + pHeight);
+          return {top: top * this.pitchY, height: pHeight * this.pitchY};
+        //}
       },
 
       _collides: function (rect, top) {
@@ -159,7 +163,7 @@ define("MethylationPlugin/View/StrandedRectLayout", [
         //console.log(rect.top);
         var bitmap = this.bitmap;
         var av = this._autovivify;
-        var yEnd = rect.top + rect.h;
+        var y = (data.data.strand === -1 ? 1 : 0);
         if (rect.r - rect.l > 20000) {
           // the rect is very big in relation to the view size, just
           // pretend, for the purposes of layout, that it extends
@@ -167,17 +171,17 @@ define("MethylationPlugin/View/StrandedRectLayout", [
           // scrolls manually for a very, very long time along the
           // genome at the same zoom level.  but most users will not
           // do that.  hopefully.
-          for (var y = rect.top; y < yEnd; y++) {
+          //for (var y = rect.top; y < yEnd; y++) {
             av(bitmap, y).allFilled = data;
-          }
+          //}
         } else {
           // this might need to change
-          for (var y = rect.top; y < yEnd; y++) {
+          //for (var y = rect.top; y < yEnd; y++) {
             // console.log(y);
             var row = av(bitmap, y);
-            for (var x = rect.l; x <= rect.r; x++)
+            for (var x = rect.l; x < rect.r; x++)
               row[x] = data;
-          }
+          //}
         }
       },
 
@@ -203,7 +207,7 @@ define("MethylationPlugin/View/StrandedRectLayout", [
         return !!this.rectangles[id];
       },
 
-      getByCoord: function (x, y) {
+      /*getByCoord: function (x, y) {
         var pY = Math.floor(y / this.pitchY);
         //console.log('coord', y);
         var r = this.bitmap[pY];
@@ -212,7 +216,7 @@ define("MethylationPlugin/View/StrandedRectLayout", [
           var pX = Math.floor(x / this.pitchX);
           return r[pX];
         }.call(this);
-      },
+      },*/
 
       getByID: function (id) {
         var r = this.rectangles[id];

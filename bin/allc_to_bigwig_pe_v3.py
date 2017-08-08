@@ -32,9 +32,11 @@ def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort):
 		outID += '_' + allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
 	else:
 		outID += '_' + label
+	
+	outID += '_v3'
 
 	print( 'Reading allC file {:s}'.format( allCFileStr ) )
-	bedGraphStr =  outID + '_v3.bedGraph'
+	bedGraphStr =  outID + '.bedGraph'
 
 	bedGraphAr = [bedGraphStr + '.' + x for x in ['cg','chg','chh'] ]
 	readAllC( allCFileStr, bedGraphAr )

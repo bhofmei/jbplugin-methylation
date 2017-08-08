@@ -51,6 +51,7 @@ return declare( JBrowsePlugin,
 {
     constructor: function( args ) {
         
+        console.log('MethylationPlugin starting');
         // create the hide/show button after genome view initialization
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;

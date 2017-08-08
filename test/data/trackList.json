@@ -1,5 +1,9 @@
 {
    "formatVersion" : 1,
+   "names" : {
+      "type" : "Hash",
+      "url" : "names/"
+   },
    "tracks" : [
       {
          "category" : "Test data",
@@ -44,9 +48,5 @@
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "label" : "track_html_methylation"
       }
-   ],
-   "names" : {
-      "url" : "names/",
-      "type" : "Hash"
-   }
+   ]
 }

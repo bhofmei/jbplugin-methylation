@@ -1,10 +1,21 @@
 Release Notes for Methylation Plugin
 
+
 # Version 3.1.0 - Aug 8, 2017
 
 - added HTML style methylation tracks
     - each feature is now a html div element not painted to the canvas
     - this will be beneficial for screenshots since html div elements are editable in pdf/svg format
+
+# Version 3.0.3 - Aug 2, 2017
+- minor bug fix with methylated option checkbox not being destroyed on chrm change
+
+# Version 3.0.2 - Jul 13, 2017
+- Fixed error where the String method "includes" was not being supported by phantomJS
+
+# Version 3.0.1 - Jun 20, 2017
+- Changed default of MethylPlot to only show methylated positions by default
+- Added print statement to plugin constructor
 
 # Version 3.0.0 - Jun 19, 2017
 

@@ -7,8 +7,9 @@ define("MethylationPlugin/View/Track/MethylHTML", [
   'dojo/dom-class',
   'dojo/Deferred',
   'JBrowse/Util',
-  'MethylationPlugin/View/StrandedRectLayout',
-  'JBrowse/View/Track/HTMLFeatures'
+  'MethylationPlugin/View/MethylRectLayout',
+  'JBrowse/View/Track/HTMLFeatures',
+  'JBrowse/View/Track/_YScaleMixin'
 ],
   function (
     declare,
@@ -20,13 +21,14 @@ define("MethylationPlugin/View/Track/MethylHTML", [
     Deferred,
     Util,
     Layout,
-    HTMLFeatures
+    HTMLFeatures,
+     YScaleMixin
   ) {
 
-    return declare([HTMLFeatures], {
+    return declare([HTMLFeatures, YScaleMixin], {
 
       constructor: function (arguments) {
-        //this.maxFeatHeight = this.config.style.height / 2.0;
+        this.height = this.config.maxHeight;
       },
 
       _defaultConfig: function () {
@@ -37,17 +39,15 @@ define("MethylationPlugin/View/Track/MethylHTML", [
             showCHG: true,
             showCHH: true,
             showMethylatedOnly: false,
+            isAnimal: false,
+            methylatedOption: false,
             maxHeight: 100,
             style: {
-              _defaultLabelScale: 50,
               className: 'methyl',
-              arrowheadClass: false,
               origin_color: 'black',
-              centerChildrenVertically: true,
-              showSubfeatures: false,
-              showLabels: false,
-              clip_marker: false,
-              minSubfeatureWidth: 0
+              cg_color:'#A36085',
+              chg_color:'#0072B2',
+              chh_color:'#CF8F00'
             }
           }
         );
@@ -63,7 +63,6 @@ define("MethylationPlugin/View/Track/MethylHTML", [
           var pitchY = this.getConf('layoutPitchY') || 1;
           this.layout = new Layout({
             pitchX: 4 / scale,
-            pitchY: pitchY,
             maxHeight: this.getConf('maxHeight')
           });
           this._layoutpitchX = 4 / scale;
@@ -71,6 +70,60 @@ define("MethylationPlugin/View/Track/MethylHTML", [
 
         return this.layout;
       },
+
+      addFeatureToBlock: function (feature, uniqueId, block, scale,
+        containerStart, containerEnd) {
+        // determine if feature should be shown
+        var isShown = this._isFeatureShown(feature);
+        if(!isShown)
+          return null;
+
+        var featDiv = this.renderFeature(feature, uniqueId, block, scale,
+          containerStart, containerEnd);
+        if (!featDiv)
+          return null;
+        block.domNode.appendChild( featDiv );
+
+        return featDiv;
+      },
+
+      _isFeatureShown: function(feature){
+        var isMethylated;
+        var score = feature.get('score');
+        var source = feature.get('source');
+
+        if(this.config.methylatedOption){
+          if(feature.get('methylated')===undefined){
+            isMethylated = this._getScoreInfo( score );
+            feature.set('methylated', isMethylated);
+          } else {
+            isMethylated = feature.get('methylated');
+          }
+        } else {
+          isMethylated = true;
+        }
+
+        if(this.config.showMethylatedOnly && !isMethylated)
+          return false;
+
+        if(source == 'cg')
+          return this.config.showCG;
+        else if (this.config.isAnimal) // ch
+          return (this.config.showCHG && this.config.showCHH);
+        else if(source == 'chg')
+          return this.config.showCHG;
+        else if(source === 'chh')
+          return this.config.showCHH;
+        else
+          return false;
+
+      },
+
+      _getScoreInfo: function(inputScore){
+        var flStr = inputScore.toFixed(7);
+        var isMethylated = parseInt(flStr.charAt(flStr.length-1))
+        return isMethylated;
+    },
 
       fillFeatures: function (args) {
         var blockIndex = args.blockIndex;
@@ -90,10 +143,6 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         block.featureNodes = {};
 
         //determine the glyph height, arrowhead width, label text dimensions, etc.
-        if (!this.haveMeasurements) {
-          this.measureStyles();
-          this.haveMeasurements = true;
-        }
 
         var curTrack = this;
 
@@ -150,6 +199,8 @@ define("MethylationPlugin/View/Track/MethylHTML", [
               curTrack.maskBySpans(invSpan, args.maskingSpans);
             }
             curTrack.renderOrigin(block, curTrack.layout.getOriginY());
+            curTrack.removeYScale();
+            curTrack.makeYScale({min: -1, max: 1});
             finishCallback();
           },
           function (error) {
@@ -161,9 +212,6 @@ define("MethylationPlugin/View/Track/MethylHTML", [
       },
 
       renderFeature: function (feature, uniqueId, block, scale, containerStart, containerEnd) {
-        //featureStart and featureEnd indicate how far left or right
-        //the feature extends in bp space, including labels
-        //and arrowheads if applicable
 
         var featureEnd = feature.get('end');
         var featureStart = feature.get('start');
@@ -171,40 +219,27 @@ define("MethylationPlugin/View/Track/MethylHTML", [
           featureEnd = parseInt(featureEnd);
         if (typeof featureStart == 'string')
           featureStart = parseInt(featureStart);
-        // layoutStart: start genome coord (at current scale) of horizontal space need to render feature,
-        //       including decorations (arrowhead, label, etc) and padding
         var layoutStart = featureStart;
-        // layoutEnd: end genome coord (at current scale) of horizontal space need to render feature,
-        //       including decorations (arrowhead, label, etc) and padding
         var layoutEnd = featureEnd;
 
         var score = feature.get('score');
+        var source = feature.get('source');
         var strand = (score >= 0 ? 1 : -1);
         feature.set('strand', strand);
 
-        //var levelHeight = this.glyphHeight + this.glyphHeightPad;
-        var levelHeight = (this.getConf('maxHeight')/2.0) * score * strand;
-        //var levelHeight = 1;
-
         layoutEnd += Math.max(1, this.padding / scale);
-        uniqueId = featureStart + '-' + featureEnd + '-' + feature.get('source');
+
         var layoutData = this._getLayout(scale)
           .addRect(uniqueId,
             layoutStart,
             layoutEnd,
-            levelHeight,
+            score,
             feature);
         var top = layoutData.top;
         var featHeight = layoutData.height;
-        if (top === null || top === undefined) {
-          // could not lay out, would exceed our configured maxHeight
-          // mark the block as exceeding the max height
-          //if (top === null && block.maxHeightExceededBottom !== true)
-          console.error('error with methylhtml plot feature')
-        }
 
         var featDiv = this.config.hooks.create(this, feature);
-        this._connectFeatDivHandlers(featDiv);
+        //this._connectFeatDivHandlers(featDiv);
         // NOTE ANY DATA SET ON THE FEATDIV DOM NODE NEEDS TO BE
         // MANUALLY DELETED IN THE cleanupBlock METHOD BELOW
         featDiv.track = this;
@@ -220,7 +255,6 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         // (callbackArgs are the args that will be passed to callbacks
         // in this feature's context menu or left-click handlers)
         featDiv.callbackArgs = [this, featDiv.feature, featDiv];
-
 
         block.featureNodes[uniqueId] = featDiv;
 
@@ -238,23 +272,17 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         var className = this.config.style.className;
         domClass.add(featDiv, className);
 
-        // Since some browsers don't deal well with the situation where
-        // the feature goes way, way offscreen, we truncate the feature
-        // to exist betwen containerStart and containerEnd.
-        // To make sure the truncated end of the feature never gets shown,
-        // we'll destroy and re-create the feature (with updated truncated
-        // boundaries) in the transfer method.
         var displayStart = Math.max(featureStart, containerStart);
         var displayEnd = Math.min(featureEnd, containerEnd);
         var blockWidth = block.endBase - block.startBase;
-        //var featheight = 100*((this.getConf('maxHeight')/2.0) * score * strand) / (this.getConf('maxHeight'));
+        var featColor = this._getConfigColor(source);
         var featwidth = Math.max(this.minFeatWidth, (100 * ((displayEnd - displayStart) / blockWidth)));
         featDiv.style.cssText =
           "left:" + (100 * (displayStart - block.startBase) / blockWidth) + "%;" +
           "top:" + top + "px;" +
           " width:" + featwidth + "%;" +
           " height:" +  Math.min(featHeight, 50) + "px;" +
-          (this.config.style.featureCss ? this.config.style.featureCss : "");
+          " background-color:" + featColor + ";";
 
         // Store the containerStart/End so we can resolve the truncation
         // when we are updating static elements
@@ -267,125 +295,6 @@ define("MethylationPlugin/View/Track/MethylHTML", [
           feature: feature,
           callbackArgs: [this, feature]
         });
-
-        return featDiv;
-      },
-      /*renderFeature: function (feature, uniqueId, block, scale, containerStart, containerEnd) {
-
-        var featureEnd = feature.get('end');
-        var featureStart = feature.get('start');
-        if (typeof featureEnd == 'string')
-          featureEnd = parseInt(featureEnd);
-        if (typeof featureStart == 'string')
-          featureStart = parseInt(featureStart);
-        // layoutStart: start genome coord (at current scale) of horizontal space need to render feature,
-        //       including decorations (arrowhead, label, etc) and padding
-        var layoutStart = featureStart;
-        // layoutEnd: end genome coord (at current scale) of horizontal space need to render feature,
-        //       including decorations (arrowhead, label, etc) and padding
-        var layoutEnd = featureEnd;
-
-        var score = feature.get('score');
-        var strand = (score >= 0 ? 1 : -1);
-        feature.set('strand', strand);
-
-        //var levelHeight = this.glyphHeight + this.glyphHeightPad;
-        var levelHeight = (this.getConf('maxHeight')/2.0) * score * strand;
-        var featHeight = (this.getConf('height')/2) * score * strand;
-
-
-        var featDiv = this.config.hooks.create(this, feature);
-        this._connectFeatDivHandlers(featDiv);
-        // NOTE ANY DATA SET ON THE FEATDIV DOM NODE NEEDS TO BE
-        // MANUALLY DELETED IN THE cleanupBlock METHOD BELOW
-        featDiv.track = this;
-        featDiv.feature = feature;
-        featDiv.layoutEnd = layoutEnd;
-
-        // border values used in positioning boolean subfeatures, if any.
-        featDiv.featureEdges = {
-          s: Math.max(featDiv.feature.get('start'), containerStart),
-          e: Math.min(featDiv.feature.get('end'), containerEnd)
-        };
-
-        // (callbackArgs are the args that will be passed to callbacks
-        // in this feature's context menu or left-click handlers)
-        featDiv.callbackArgs = [this, featDiv.feature, featDiv];
-
-
-        block.featureNodes[uniqueId] = featDiv;
-
-        // record whether this feature protrudes beyond the left and/or right side of the block
-        if (layoutStart < block.startBase) {
-          if (!block.leftOverlaps) block.leftOverlaps = [];
-          block.leftOverlaps.push(uniqueId);
-        }
-        if (layoutEnd > block.endBase) {
-          if (!block.rightOverlaps) block.rightOverlaps = [];
-          block.rightOverlaps.push(uniqueId);
-        }
-        // update
-        domClass.add(featDiv, "feature");
-        var className = this.config.style.className;
-        domClass.add(featDiv, className);
-        var seqLen = feature.get('seq_length');
-        // pi rnas
-        if (seqLen > 25 && seqLen < 32 && this.config.isAnimal)
-          domClass.add(featDiv, 'smrna-' + 'pi');
-        // other
-        else if (seqLen < 21 || seqLen >= 25)
-          domClass.add(featDiv, 'smrna-' + 'other');
-        // otherwise it's fine
-        else
-          domClass.add(featDiv, 'smrna-' + seqLen);
-
-
-        // check multimapping
-        if (feature.get('supplementary_alignment') || (typeof feature.get('xm') != 'undefined' && feature.get('xm') > 1) || (typeof feature.get('nh') != 'undefined' && feature.get('nh') > 1)) {
-          if (!this.config.style.solidFill)
-            domClass.add(featDiv, 'multimapped');
-        }
-
-        // Since some browsers don't deal well with the situation where
-        // the feature goes way, way offscreen, we truncate the feature
-        // to exist betwen containerStart and containerEnd.
-        // To make sure the truncated end of the feature never gets shown,
-        // we'll destroy and re-create the feature (with updated truncated
-        // boundaries) in the transfer method.
-        var displayStart = Math.max(featureStart, containerStart);
-        var displayEnd = Math.min(featureEnd, containerEnd);
-        var blockWidth = block.endBase - block.startBase;
-        var featheight = 100*((this.getConf('maxHeight')/2.0) * score * strand) / (this.getConf('maxHeight'));
-        var featwidth = Math.max(this.minFeatWidth, (100 * ((displayEnd - displayStart) / blockWidth)));
-        featDiv.style.cssText =
-          "left:" + (100 * (displayStart - block.startBase) / blockWidth) + "%;" +
-          "top:" + top + "px;" +
-          " width:" + featwidth + "%;" +
-          " height:" +  Math.min(featheight, 50) + "%;" +
-          (this.config.style.featureCss ? this.config.style.featureCss : "");
-
-        // Store the containerStart/End so we can resolve the truncation
-        // when we are updating static elements
-        featDiv._containerStart = containerStart;
-        featDiv._containerEnd = containerEnd;
-
-        // fill in the template parameters in the featDiv and also for the labelDiv (see below)
-        var context = lang.mixin({
-          track: this,
-          feature: feature,
-          callbackArgs: [this, feature]
-        });
-
-        return featDiv;
-      },*/
-
-      addFeatureToBlock: function (feature, uniqueId, block, scale,
-        containerStart, containerEnd) {
-        var featDiv = this.renderFeature(feature, uniqueId, block, scale,
-          containerStart, containerEnd);
-        if (!featDiv)
-          return null;
-        block.domNode.appendChild( featDiv );
 
         return featDiv;
       },
@@ -405,9 +314,8 @@ define("MethylationPlugin/View/Track/MethylHTML", [
               width: '100%',
               top: originY + 'px'
             },
-            className: 'feature'
+            className: 'feature methyl-origin'
           }, block.domNode);
-          //block.domNode.addChild(origin);
         }
       },
 
@@ -422,6 +330,20 @@ define("MethylationPlugin/View/Track/MethylHTML", [
             });
             return o.concat.apply(o, options);
           });
-      }
+      },
+
+      _getConfigColor: function(id) {
+        if( id == 'cg' )
+            return this.config.style.cg_color;
+        else if(this.config.isAnimal) // ch
+            return this.config.style.ch_color;
+        else if( id == 'chg' )
+            return this.config.style.chg_color;
+        else if( id == 'chh' )
+            return this.config.style.chh_color;
+        else
+            return 'black';
+
+    },
     });
   });

@@ -19,6 +19,7 @@ define('MethylationPlugin/main', [
     'JBrowse/View/Dialog/SetTrackHeight',
     './View/Track/Wiggle/MethylXYPlot',
     './View/Track/Wiggle/MethylPlot',
+  './View/Track/MethylHTMLPlot',
     './Store/SeqFeature/MethylBigWig'
 ],
 function(
@@ -42,6 +43,7 @@ function(
     SetTrackHeightDialog,
     MethylXYPlot,
     MethylPlot,
+    MethyHTMLPlot,
     MethylBigWig
 ){
  
@@ -60,7 +62,8 @@ return declare( JBrowsePlugin,
         }
         // if animal, extend new default config functions for MethylPlot and MethylXYPlot
         if(this.config.isAnimal){
-            lang.extend(MethylPlot, {_defaultConfig: thisB._defaultConfigM});
+            lang.extend(MethylPlot, {_isAnimal: thisB._isAnimal});
+          lang.extend(MethyHTMLPlot, {_isAnimal: thisB._isAnimal});
         }
         browser.afterMilestone( 'initView', function() {
             var navBox = dojo.byId("navbox");
@@ -127,7 +130,7 @@ return declare( JBrowsePlugin,
                             var tracks = browser.view.visibleTracks();
                             array.forEach( tracks, function( track ) {
                                 // operate only MethylXYPlot and MethylPlot tracks
-                                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) )){
+                                if( !(/\b(Methyl.*Plot)/.test( track.config.type )   )){
                                     return;
                                 }
                                 track.trackHeightChanged=true;
@@ -157,7 +160,7 @@ return declare( JBrowsePlugin,
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
                 // operate only on XYPlot or Density tracks
-                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
+                if( !(/\b(Methyl.*Plot)/.test( track.config.type ) ))
                 return;
                 track.config.showCG = isShow;
                 track.changed();
@@ -188,7 +191,7 @@ return declare( JBrowsePlugin,
 
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
-                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
+                if( !(/\b(Methyl.*Plot)/.test( track.config.type ) ))
                 return;
                 track.config.showCHG = isShow;
                 track.config.showCHH = isShow;
@@ -220,7 +223,7 @@ return declare( JBrowsePlugin,
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
                 // operate only on XYPlot or Density tracks
-                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
+                if( !(/\b(Methyl.*Plot)/.test( track.config.type ) ))
                 return;
                 track.config.showCHG = isShow;
                 track.changed();
@@ -251,7 +254,7 @@ return declare( JBrowsePlugin,
             var tracks = browser.view.visibleTracks();
             array.forEach( tracks, function( track ) {
                 // operate only on XYPlot or Density tracks
-                if( !(/\b(MethylXYPlot)/.test( track.config.type )  || /\b(MethylPlot)/.test( track.config.type ) ))
+                if( !(/\b(Methyl.*Plot)/.test( track.config.type )))
                 return;
                 track.config.showCHH = isShow;
                 track.changed();
@@ -266,24 +269,9 @@ return declare( JBrowsePlugin,
             }, 1000);
         }
     },
-    _defaultConfigM: function(){
-        return Util.deepUpdate(
-            dojo.clone( this.inherited("_defaultConfig",arguments) ),
-            {
-                logScaleOption: false,
-                max_score: 1,
-                min_score: -1,
-                style: {
-                    origin_color: 'gray',
-                    cg_color:'#A36085',
-                    ch_color:'#88C043'
-                },
-                showCG: true,
-                showCHG: true,
-                showCHH: true,
-                isAnimal: true
-            }
-        );
-    }
+
+  _isAnimal: function(){
+    return true;
+  }
 });
 });

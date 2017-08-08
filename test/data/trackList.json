@@ -6,52 +6,47 @@
    },
    "tracks" : [
       {
+         "category" : "Test data",
          "key" : "Reference sequence",
-         "seqType" : "dna",
-         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-",
-         "category" : "Test data",
-         "chunkSize" : 20000,
-         "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
          "type" : "SequenceTrack",
-         "label" : "DNA"
+         "chunkSize" : 20000,
+         "seqType" : "dna",
+         "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
+         "label" : "DNA",
+         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-"
       },
       {
-         "key" : "genes",
-         "compress" : 0,
-         "category" : "Test data",
-         "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
          "type" : "JBrowse/View/Track/CanvasFeatures",
-         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
          "style" : {
-            "className" : "feature",
-            "color" : "#daa520"
+            "className" : "feature"
          },
-         "label" : "genes"
-      },
-      {
-         "label" : "tes",
-         "key" : "tes",
-         "compress" : 0,
          "category" : "Test data",
-         "urlTemplate" : "tracks/tes/{refseq}/trackData.json",
+         "key" : "Genes",
+         "urlTemplate" : "tracks/genes/{refseq}/trackData.json",
+         "trackType" : null,
+         "label" : "genes",
          "storeClass" : "JBrowse/Store/SeqFeature/NCList",
-         "style" : {
-            "className" : "feature",
-            "color" : "#77158D"
-         },
-         "type" : "JBrowse/View/Track/CanvasFeatures"
+         "compress" : 0
       },
       {
-         "style" : {
-            "height" : 50
-         },
          "category" : "Test data",
          "key" : "Wild Type Methylation",
-         "methylatedOption" : true,
-         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
-         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "label" : "track_wild_type_methylation",
-         "urlTemplate" : "test_methyl_short_v3.bw"
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
+         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
+         "style" : {
+            "height" : 50
+         }
+      },
+      {
+         "type" : "MethylationPlugin/View/Track/MethylHTMLPlot",
+         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
+         "category" : "Test data",
+        "maxHeight": 100,
+         "key" : "WT HTML Methylation",
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "label" : "track_html_methylation"
       }
    ]
 }

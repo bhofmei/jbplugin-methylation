@@ -43,9 +43,8 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
 
           array.forEach(registry.toArray(), function (x) {
             var i = x.id;
-
-            if (i.includes(thisB.config.label) && (/c.*-checkbox/.test(i)))
-              registry.byId(i).destroy();
+            if (i !== undefined && ( i.indexOf(thisB.config.label) >=0 ) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i)))
+            registry.byId(i).destroy();
           });
 
         },
@@ -69,7 +68,6 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
               showCHH: true,
               showMethylatedOnly: false,
               isAnimal: thisB._isAnimal()
-
             }
           );
         },
@@ -304,16 +302,15 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             options.push.apply(
               options, [
                 {
-                    label: 'Show Methylated Sites Only',
-                    type: 'dijit/CheckedMenuItem',
-                    checked: track.config.showMethylatedOnly,
-                    id: track.config.label + '-methylated-checkbox',
-                    //class: 'track-cg-checkbox',
-                    onClick: function(event) {
-                        track.config.showMethylatedOnly = this.checked;
-                        track.changed();
-                    }
-
+                  label: 'Show Methylated Sites Only',
+                  type: 'dijit/CheckedMenuItem',
+                  checked: track.config.showMethylatedOnly,
+                  id: track.config.label + '-methylated-checkbox',
+                  //class: 'track-cg-checkbox',
+                  onClick: function (event) {
+                    track.config.showMethylatedOnly = this.checked;
+                    track.changed();
+                  }
                 }
             ]);
           }

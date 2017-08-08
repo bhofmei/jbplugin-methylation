@@ -34,14 +34,14 @@
          "label" : "track_wild_type_methylation",
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
-         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
+         "urlTemplate" : "test_methyl_short_v3.bw",
          "style" : {
             "height" : 50
          }
       },
       {
          "type" : "MethylationPlugin/View/Track/MethylHTMLPlot",
-         "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
+         "urlTemplate" : "test_methyl_short_v3.bw",
          "category" : "Test data",
         "maxHeight": 100,
          "key" : "WT HTML Methylation",

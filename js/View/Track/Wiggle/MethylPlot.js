@@ -1,5 +1,6 @@
 define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
   'dojo/_base/declare',
+  'dojo/_base/lang',
   'dojo/_base/array',
   'dojo/_base/Color',
   'dojo/dom',
@@ -11,7 +12,20 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
   'JBrowse/Util',
   'JBrowse/View/Track/Wiggle/_Scale'
 ],
-  function (declare, array, Color, dom, domConstruct, registry, on, WiggleBase, YScaleMixin, Util, Scale) {
+  function (
+    declare,
+    lang,
+    array,
+    Color,
+    dom,
+    domConstruct,
+    registry,
+    on,
+    WiggleBase,
+    YScaleMixin,
+    Util,
+    Scale
+  ) {
 
     var XYPlot = declare([WiggleBase, YScaleMixin],
 
@@ -36,6 +50,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
         },
 
         _defaultConfig: function () {
+          var thisB = this;
           return Util.deepUpdate(
             dojo.clone(this.inherited(arguments)), {
               logScaleOption: false,
@@ -52,10 +67,14 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
               showCHG: true,
               showCHH: true,
               showMethylatedOnly: false,
-              isAnimal: false
+              isAnimal: thisB._isAnimal()
             }
           );
         },
+
+      _isAnimal: function(){
+        return false;
+      },
 
         _getScaling: function (viewArgs, successCallback, errorCallback) {
 
@@ -198,7 +217,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           var canvasHeight = canvas.height;
 
           var ratio = Util.getResolution(context, this.browser.config.highResolutionMode);
-          var toY = dojo.hitch(this, function (val) {
+          var toY = lang.hitch(this, function (val) {
             return canvasHeight * (1 - dataScale.normalize(val)) / ratio;
           });
           var thisB = this;

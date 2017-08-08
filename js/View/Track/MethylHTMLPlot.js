@@ -55,7 +55,7 @@ define("MethylationPlugin/View/Track/MethylHTMLPlot", [
           showCHG: true,
           showCHH: true,
           showMethylatedOnly: false,
-          isAnimal: false,
+          isAnimal: thisB._isAnimal(),
           methylatedOption: false,
           maxHeight: 100,
           style: {
@@ -68,6 +68,10 @@ define("MethylationPlugin/View/Track/MethylHTMLPlot", [
           yScalePosition: 'center'
         });
         return c;
+      },
+
+      _isAnimal: function(){
+        return false;
       },
 
       /* Functions from html tracks that need to be changed for small-rna specific purposes */

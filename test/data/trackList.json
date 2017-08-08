@@ -39,6 +39,7 @@
          "type" : "MethylationPlugin/View/Track/MethylHTMLPlot",
          "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
          "category" : "Test data",
+        "maxHeight": 100,
          "key" : "WT HTML Methylation",
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "label" : "track_html_methylation"

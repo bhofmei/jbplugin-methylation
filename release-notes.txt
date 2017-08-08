@@ -1,5 +1,11 @@
 Release Notes for Methylation Plugin
 
+# Version 3.1.0 - Aug 8, 2017
+
+- added HTML style methylation tracks
+    - each feature is now a html div element not painted to the canvas
+    - this will be beneficial for screenshots since html div elements are editable in pdf/svg format
+
 # Version 3.0.0 - Jun 19, 2017
 
 - Updated MethylPlot with a "ShowMethylatedOnly" option, when checked, it only shows "methylated" sites

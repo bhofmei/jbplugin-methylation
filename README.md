@@ -45,6 +45,16 @@ Sample data is included in the plugin to test that the plugin is working properl
     - Includes support to be able to filter use all or only methylated sites within one track. This keeps the global view looking good when zoomed out but allows for better visualization when zoomed in.
 - Even for animals, who are interested in CG and CH, use the three contexts specified here. CHG and CHH are combined by the plugin to form CH context.
 
+### HTML-style Track
+- Using the HTML-style track is not recommended because it can be slow for large regions and/or lots of data.
+- However, HTML-style tracks are preferred when taking screenshots. 
+  - The default methyl track type paints the basepair methylation (feature) on a HTML `canvas` element.
+  - That's great for speed but is exported as an uneditable image.
+  - In the HTML-style tracks,  each base (feature) is exported as an editable HTML `div` element
+-  It is recommended you add all tracks as version 3 tracks and _only_ use HTML-style tracks when taking screenshots. 
+See this [JBrowse plugin](https://github.com/bhofmei/jbplugin-screenshot.git) which makes taking screenshots easy and is configured to work with this methylation plugin.
+- **Note**: The HTML-style track does allow for hiding/showing context and "methylated positions only" but does not support min and max score changes (default min: -1, max: 1).
+
 ### File Conversion
 The methylation tracks works best when the data is stored as BigWig file(s). File conversion is easy, though. Use the conversion program appropriate to your input file type. 
 _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See details below for acquiring this program.  
@@ -129,28 +139,30 @@ Usage:  python3 bismark_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_i
 Track specifications are very similar to those for XYPlots (see JBrowse tutorial for more information). The _label_, _type_, and _urlTemplate_ must be specified. 
 
 #### Version 1
-
-    {  
-        "key" : "Wild Type Methylation",
-        "label" : "track_wild_type_methylation",
-        "style" : { "height" : 50 },
-        "storeClass" : "JBrowse/Store/SeqFeature/BigWig",
-        "urlTemplate" : "path/to/bigwig_file.bw",
-        "type" : "MethylationPlugin/View/Track/Wiggle/MethylXYPlot"
-    }
+```
+{  
+  "key" : "Wild Type Methylation",
+  "label" : "track_wild_type_methylation",
+  "style" : { "height" : 50 },
+  "storeClass" : "JBrowse/Store/SeqFeature/BigWig",
+  "urlTemplate" : "path/to/bigwig_file.bw",
+  "type" : "MethylationPlugin/View/Track/Wiggle/MethylXYPlot"
+}
+```
     
 #### Version 2
 
 _urlTemplate_ is the path and filename up-to, but not including, the context-specific extension. For example `"urlTemplate" : "path/my-file.bw"` from example above.
-
-    {  
-        "key" : "Wild Type Methylation",
-        "label" : "track_wild_type_methylation",
-        "style" : { "height" : 50 },
-        "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
-        "urlTemplate" : "path/to/bigwig_file.bw",
-        "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot"
-    }
+```
+{  
+  "key" : "Wild Type Methylation",
+  "label" : "track_wild_type_methylation",
+  "style" : { "height" : 50 },
+  "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+  "urlTemplate" : "path/to/bigwig_file.bw",
+  "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot"
+}
+```
 If there is not a file for all contexts (CG, CHG, and CHH), include the following in the track configuration and specify only the contexts needed. 
 
 ```
@@ -163,6 +175,20 @@ Same as Version 2 except add this to configuration
 ```
 "methylatedOption" : true
 ```
+
+#### HTML-Style
+```
+{
+  "type" : "MethylationPlugin/View/Track/MethylHTMLPlot",
+  "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
+  "category" : "Test data",
+  "maxHeight": 100,
+  "key" : "WT HTML Methylation",
+  "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+  "label" : "track_html_methylation"
+}
+```
+
     
 ### Animal-specific coloring
 While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see above).

@@ -6,6 +6,7 @@ define("MethylationPlugin/View/Track/MethylHTML", [
   'dojo/dom-construct',
   'dojo/dom-class',
   'dojo/Deferred',
+  'dijit/registry',
   'JBrowse/Util',
   'MethylationPlugin/View/MethylRectLayout',
   'JBrowse/View/Track/HTMLFeatures',
@@ -19,48 +20,53 @@ define("MethylationPlugin/View/Track/MethylHTML", [
     domConstruct,
     domClass,
     Deferred,
+    registry,
     Util,
     Layout,
     HTMLFeatures,
-     YScaleMixin
+    YScaleMixin
   ) {
 
     return declare([HTMLFeatures, YScaleMixin], {
 
       constructor: function (arguments) {
         this.height = this.config.maxHeight;
-        // remove unnecessary configs
+        var thisB = this;
+        array.forEach(registry.toArray(), function (x) {
+          var i = x.id;
+          if (i.includes(thisB.config.label) && (/c.*-checkbox/.test(i)))
+            registry.byId(i).destroy();
+        });
       },
 
       _defaultConfig: function () {
         var thisB = this;
         var inher = dojo.clone(this.inherited(arguments));
-        var omit = ['maxFeatureSizeForUnderlyingRefSeq','maxFeatureScreenDensity','menuTemplate','events'];
-        var styleOmit = ['centerChildrenVertically', 'label', 'description', '_defaultHistScale', '_defaultLabelScale', '_defaultDescriptionScale', 'arrowheadClass','minSubfeatureWidth','maxDescriptionLength','showLabels'];
-        array.forEach(omit, function(elt){
+        var omit = ['maxFeatureSizeForUnderlyingRefSeq', 'maxFeatureScreenDensity', 'menuTemplate', 'events'];
+        var styleOmit = ['centerChildrenVertically', 'label', 'description', '_defaultHistScale', '_defaultLabelScale', '_defaultDescriptionScale', 'arrowheadClass', 'minSubfeatureWidth', 'maxDescriptionLength', 'showLabels'];
+        array.forEach(omit, function (elt) {
           delete inher[elt];
         });
-        array.forEach(styleOmit, function(elt){
+        array.forEach(styleOmit, function (elt) {
           delete inher.style[elt];
         });
         var c = Util.deepUpdate(inher, {
-            showCG: true,
-            showCHG: true,
-            showCHH: true,
-            showMethylatedOnly: false,
-            isAnimal: false,
-            methylatedOption: false,
-            maxHeight: 100,
-            style: {
-              className: 'feature-methyl',
-              origin_color: 'black',
-              cg_color:'#A36085',
-              chg_color:'#0072B2',
-              chh_color:'#CF8F00'
-            },
+          showCG: true,
+          showCHG: true,
+          showCHH: true,
+          showMethylatedOnly: false,
+          isAnimal: false,
+          methylatedOption: false,
+          maxHeight: 100,
+          style: {
+            className: 'feature-methyl',
+            origin_color: 'black',
+            cg_color: '#A36085',
+            chg_color: '#0072B2',
+            chh_color: '#CF8F00'
+          },
           yScalePosition: 'center'
-          }
-        );
+        });
         return c;
       },
 
@@ -83,28 +89,24 @@ define("MethylationPlugin/View/Track/MethylHTML", [
 
       addFeatureToBlock: function (feature, uniqueId, block, scale,
         containerStart, containerEnd) {
-        // determine if feature should be shown
-        var isShown = this._isFeatureShown(feature);
-        if(!isShown)
-          return null;
 
         var featDiv = this.renderFeature(feature, uniqueId, block, scale,
           containerStart, containerEnd);
         if (!featDiv)
           return null;
-        block.domNode.appendChild( featDiv );
+        block.domNode.appendChild(featDiv);
 
         return featDiv;
       },
 
-      _isFeatureShown: function(feature){
+      renderFilter: function (feature) {
         var isMethylated;
         var score = feature.get('score');
         var source = feature.get('source');
 
-        if(this.config.methylatedOption){
-          if(feature.get('methylated')===undefined){
-            isMethylated = this._getScoreInfo( score );
+        if (this.config.methylatedOption) {
+          if (feature.get('methylated') === undefined) {
+            isMethylated = this._getScoreInfo(score);
             feature.set('methylated', isMethylated);
           } else {
             isMethylated = feature.get('methylated');
@@ -113,27 +115,27 @@ define("MethylationPlugin/View/Track/MethylHTML", [
           isMethylated = true;
         }
 
-        if(this.config.showMethylatedOnly && !isMethylated)
+        if (this.config.showMethylatedOnly && !isMethylated)
           return false;
 
-        if(source == 'cg')
+        if (source == 'cg')
           return this.config.showCG;
         else if (this.config.isAnimal) // ch
           return (this.config.showCHG && this.config.showCHH);
-        else if(source == 'chg')
+        else if (source == 'chg')
           return this.config.showCHG;
-        else if(source === 'chh')
+        else if (source === 'chh')
           return this.config.showCHH;
         else
           return false;
 
       },
 
-      _getScoreInfo: function(inputScore){
+      _getScoreInfo: function (inputScore) {
         var flStr = inputScore.toFixed(7);
-        var isMethylated = parseInt(flStr.charAt(flStr.length-1))
+        var isMethylated = parseInt(flStr.charAt(flStr.length - 1))
         return isMethylated;
-    },
+      },
 
       fillFeatures: function (args) {
         var blockIndex = args.blockIndex;
@@ -162,11 +164,11 @@ define("MethylationPlugin/View/Track/MethylHTML", [
             if (this.filterFeature(feature)) {
 
               // hook point
-              var render = 1;
+              var render = true;
               if (typeof this.renderFilter === 'function')
                 render = this.renderFilter(feature);
 
-              if (render === 1) {
+              if (render) {
                 this.addFeatureToBlock(feature, uniqueId, block, scale, containerStart, containerEnd);
               }
             }
@@ -210,7 +212,10 @@ define("MethylationPlugin/View/Track/MethylHTML", [
             }
             curTrack.renderOrigin(block, curTrack.layout.getOriginY());
             curTrack.removeYScale();
-            curTrack.makeYScale({min: -1, max: 1});
+            curTrack.makeYScale({
+              min: -1,
+              max: 1
+            });
             finishCallback();
           },
           function (error) {
@@ -291,7 +296,7 @@ define("MethylationPlugin/View/Track/MethylHTML", [
           "left:" + (100 * (displayStart - block.startBase) / blockWidth) + "%;" +
           "top:" + top + "px;" +
           " width:" + featwidth + "%;" +
-          " height:" +  Math.min(featHeight, 50) + "px;" +
+          " height:" + Math.min(featHeight, 50) + "px;" +
           " background-color:" + featColor + ";";
 
         // Store the containerStart/End so we can resolve the truncation
@@ -329,31 +334,102 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         }
       },
 
-      _trackMenuOptions: function () {
-        var track = this;
-        var displayOptions = [];
-        return all([this.inherited(arguments), displayOptions])
-          .then(function (options) {
-            var o = options.shift();
-            options.unshift({
-              type: 'dijit/MenuSeparator'
-            });
-            return o.concat.apply(o, options);
-          });
+      _getConfigColor: function (id) {
+        if (id == 'cg')
+          return this.config.style.cg_color;
+        else if (this.config.isAnimal) // ch
+          return this.config.style.ch_color;
+        else if (id == 'chg')
+          return this.config.style.chg_color;
+        else if (id == 'chh')
+          return this.config.style.chh_color;
+        else
+          return 'black';
+
       },
 
-      _getConfigColor: function(id) {
-        if( id == 'cg' )
-            return this.config.style.cg_color;
-        else if(this.config.isAnimal) // ch
-            return this.config.style.ch_color;
-        else if( id == 'chg' )
-            return this.config.style.chg_color;
-        else if( id == 'chh' )
-            return this.config.style.chh_color;
-        else
-            return 'black';
+      _trackMenuOptions: function () {
+        var options = this.inherited(arguments);
+        options.splice(options.length - 2, 2);
+        //console.log(options);
+        var track = this;
+        //console.log(track);
+        options.push.apply(
+          options, [
+            {
+              type: 'dijit/MenuSeparator'
+              },
+            {
+              label: 'Show CG Methylation',
+              type: 'dijit/CheckedMenuItem',
+              checked: track.config.showCG,
+              id: track.config.label + '-cg-checkbox',
+              class: 'track-cg-checkbox',
+              onClick: function (event) {
+                track.config.showCG = this.checked;
+                track.changed();
+              }
+                }
+            ]);
+        if (this.config.isAnimal) {
+          options.push.apply(
+            options, [{
+                label: 'Show CH Methylation',
+                type: 'dijit/CheckedMenuItem',
+                checked: (track.config.showCHG && track.config.showCHH),
+                id: track.config.label + '-ch-checkbox',
+                class: 'track-ch-checkbox',
+                onClick: function (event) {
+                  track.config.showCHG = this.checked;
+                  track.config.showCHH = this.checked;
+                  track.changed();
+                }
+                }
+            ]);
+        } else {
+          options.push.apply(
+            options, [{
+                label: 'Show CHG Methylation',
+                type: 'dijit/CheckedMenuItem',
+                checked: track.config.showCHG,
+                id: track.config.label + '-chg-checkbox',
+                class: 'track-chg-checkbox',
+                onClick: function (event) {
+                  track.config.showCHG = this.checked;
+                  track.changed();
+                }
+                },
+              {
+                label: 'Show CHH Methylation',
+                type: 'dijit/CheckedMenuItem',
+                checked: track.config.showCHH,
+                id: track.config.label + '-chh-checkbox',
+                class: 'track-chh-checkbox',
+                onClick: function (event) {
+                  track.config.showCHH = this.checked;
+                  track.changed();
+                }
+                }
+            ]);
+        }
+        if (this.config.methylatedOption) {
+          options.push.apply(
+            options, [
+              {
+                label: 'Show Methylated Sites Only',
+                type: 'dijit/CheckedMenuItem',
+                checked: track.config.showMethylatedOnly,
+                //id: track.config.label + '-cg-checkbox',
+                //class: 'track-cg-checkbox',
+                onClick: function (event) {
+                  track.config.showMethylatedOnly = this.checked;
+                  track.changed();
+                }
+                }
+            ]);
+        }
+        return options;
+      },
 
-    },
     });
   });

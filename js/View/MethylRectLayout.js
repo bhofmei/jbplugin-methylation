@@ -4,7 +4,7 @@
  * 'pitchX' and 'pitchY' are ratios of input scale resolution to
  * internal bitmap resolution
  */
-define("MethylationPlugin/View/StrandedRectLayout", [
+define("MethylationPlugin/View/MethylRectLayout", [
   'dojo/_base/declare'
 ],
   function (declare) {

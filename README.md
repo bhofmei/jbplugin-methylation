@@ -29,7 +29,8 @@ If that doesn't work, add this to _jbrowse_conf.json_:
 
 ## Test
 Sample data is included in the plugin to test that the plugin is working properly. With `URL` as the URL path to the JBrowse instance, navigate a web browser to `URL/index.html?data=plugins/MethylationPlugin/test/data`.
-**Note:** test data is for v2 tracks but will be updated soon
+
+![Demo image](img/demo_image.png)
 
 ## Using Methylation Tracks
 ### Versions
@@ -207,6 +208,7 @@ Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 ## Future Plans
 - corrected global statistics
 - improved documentation for the different versions
+- Complimentary track style with HTML features, which will be useful for screenshots
 
 ## Getting bedGraphToBigWig and bedSort
 Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>  

@@ -82,3 +82,12 @@ tr.track-chh-checkbox  span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitChecked
 tr.track-chh-checkbox img.dijitCheckedMenuItemIcon{
     background-image: url("../img/checkmark-chh.png")
 }
+
+/* HTML css styling */
+.feature-methyl{
+  cursor: default;
+}
+
+.methyl-origin{
+  z-index: 100;
+}

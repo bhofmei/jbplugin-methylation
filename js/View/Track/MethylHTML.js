@@ -29,12 +29,21 @@ define("MethylationPlugin/View/Track/MethylHTML", [
 
       constructor: function (arguments) {
         this.height = this.config.maxHeight;
+        // remove unnecessary configs
       },
 
       _defaultConfig: function () {
         var thisB = this;
-        var c = Util.deepUpdate(
-          dojo.clone(this.inherited(arguments)), {
+        var inher = dojo.clone(this.inherited(arguments));
+        var omit = ['maxFeatureSizeForUnderlyingRefSeq','maxFeatureScreenDensity','menuTemplate','events'];
+        var styleOmit = ['centerChildrenVertically', 'label', 'description', '_defaultHistScale', '_defaultLabelScale', '_defaultDescriptionScale', 'arrowheadClass','minSubfeatureWidth','maxDescriptionLength','showLabels'];
+        array.forEach(omit, function(elt){
+          delete inher[elt];
+        });
+        array.forEach(styleOmit, function(elt){
+          delete inher.style[elt];
+        });
+        var c = Util.deepUpdate(inher, {
             showCG: true,
             showCHG: true,
             showCHH: true,
@@ -43,12 +52,13 @@ define("MethylationPlugin/View/Track/MethylHTML", [
             methylatedOption: false,
             maxHeight: 100,
             style: {
-              className: 'methyl',
+              className: 'feature-methyl',
               origin_color: 'black',
               cg_color:'#A36085',
               chg_color:'#0072B2',
               chh_color:'#CF8F00'
-            }
+            },
+          yScalePosition: 'center'
           }
         );
         return c;
@@ -276,7 +286,7 @@ define("MethylationPlugin/View/Track/MethylHTML", [
         var displayEnd = Math.min(featureEnd, containerEnd);
         var blockWidth = block.endBase - block.startBase;
         var featColor = this._getConfigColor(source);
-        var featwidth = Math.max(this.minFeatWidth, (100 * ((displayEnd - displayStart) / blockWidth)));
+        var featwidth = 100 * ((displayEnd - displayStart) / blockWidth);
         featDiv.style.cssText =
           "left:" + (100 * (displayStart - block.startBase) / blockWidth) + "%;" +
           "top:" + top + "px;" +

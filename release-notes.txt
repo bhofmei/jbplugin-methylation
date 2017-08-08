@@ -1,5 +1,12 @@
 Release Notes for Methylation Plugin
 
+
+# Version 3.1.0 - Aug 8, 2017
+
+- added HTML style methylation tracks
+    - each feature is now a html div element not painted to the canvas
+    - this will be beneficial for screenshots since html div elements are editable in pdf/svg format
+
 # Version 3.0.3 - Aug 2, 2017
 - minor bug fix with methylated option checkbox not being destroyed on chrm change
 

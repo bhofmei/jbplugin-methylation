@@ -211,13 +211,25 @@ Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 - Complimentary track style with HTML features, which will be useful for screenshots
 
 ## Getting bedGraphToBigWig and bedSort
+### Option 1: Download manually
 Mac OSX 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/>  
 Linux 64-bit: <http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/>  
 Older Linux/Linux server: http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64.v287/
 
 - Choose the appropriate web page from above. There will be a long list of programs. 
-- Scroll down to find __bedGraphToBigWig__
+- Scroll down to find __bedGraphToBigWig__ and __bedSort__
 - Save this program to computer
 - In terminal, navigate to the directory with the program
-- Type `chmod u+x bedGraphToBigWig`
+- Type `chmod u+x bedGraphToBigWig bedSort`
 - Move the program to the same directory as __allc_to_bigwig_pe.py__ or add to path in __.bashrc__ or __.bash_profile__
+
+### Option 2: Create symbolic links
+Versions of __bedGraphToBigWig__ and __bedSort__ are included in the _bin_ directory.
+
+Based on the operating system, create symbolic links in the _bin_ directory
+
+- MacOSX 64-bit: `ln -s bedGraphToBigWig_macOSX.x86_63 bedGraphToBigWig; ln -s bedSort_macOSX.x86_64 bedSort`
+- Linux 64-bit: `ln -s bedGraphToBigWig_linux.x86_64 bedGraphToBigWig; ln -s bedSort_linux.x86_64 bedSort`
+- Older Linux: `ln -s bedGraphToBigWig_linux.x86_64.v287 bedGraphToBigWig; ln -s bedSort_linux.x86_64.v287 bedSort`
+
+For best results, add this directory to `PATH` in __.bashrc__ or __.bash_profile__.

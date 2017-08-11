@@ -1,5 +1,5 @@
 {
-  "name": "jbplugin-methylation",
+  "name": "MethylationPlugin",
   "version": "3.1.0",
   "description": "JBrowse plugin for viewing DNA methylation",
   "main": "js/main.js",

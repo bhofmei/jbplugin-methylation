@@ -40,7 +40,7 @@
          }
       },
       {
-         "type" : "MethylationPlugin/View/Track/MethylHTMLPlot",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot",
          "urlTemplate" : "test_methyl_short_v3.bw",
          "category" : "Test data",
         "maxHeight": 100,

@@ -20,7 +20,7 @@ define('MethylationPlugin/main', [
     'JBrowse/View/Dialog/SetTrackHeight',
     './View/Track/Wiggle/MethylXYPlot',
     './View/Track/Wiggle/MethylPlot',
-     './View/Track/MethylHTMLPlot',
+     './View/Track/Wiggle/MethylHTMLPlot',
     './Store/SeqFeature/MethylBigWig'
 ],
   function (

@@ -71,6 +71,20 @@ define('MethylationPlugin/main', [
             _isAnimal: thisB._isAnimal
           });
         }
+        // register the track types
+        browser.registerTrackType({
+                label: 'MethylPlot',
+                type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
+            });
+        browser.registerTrackType({
+                label: 'MethylXYPlot',
+                type: 'MethylationPlugin/View/Track/Wiggle/MethylXYPlot'
+            });
+        browser.registerTrackType({
+                label: 'MethylHTMLPlot',
+                type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
+            });
+        //
         browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
           browser.hideCGButton = new dijitButton({

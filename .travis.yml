@@ -3,10 +3,12 @@ node_js:
     - 7
 sudo: false
 cache:
+  - pip
+  - yarn
 before_install:
   - pip install --user RangeHTTPServer
 install:
-  - npm install
+  - TRAVIS_CI=1 yarn install
 before_script:
   - python -m RangeHTTPServer &
 script:

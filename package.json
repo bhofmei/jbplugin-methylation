@@ -1,37 +1,35 @@
 {
-  "name": "MethylationPlugin",
-  "version": "3.1.0",
-  "description": "JBrowse plugin for viewing DNA methylation",
-  "main": "js/main.js",
-  "scripts": {
-    "preinstall": "export YN=1",
-    "postinstall": "unset YN",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bhofmei/jbplugin-methylation.git"
-  },
-  "keywords": [
+    "name": "jbplugin-methylation",
+    "version": "3.1.0",
+    "description": "JBrowse plugin for viewing DNA methylation",
+    "main": "js/main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bhofmei/jbplugin-methylation.git"
+    },
+    "keywords": [
     "jbrowse",
     "jbrowse-plugin",
     "methylation"
   ],
-  "author": "Brigitte Hofmeister",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/bhofmei/jbplugin-methylation/issues"
-  },
-  "ignore": [
+    "author": "Brigitte Hofmeister",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/bhofmei/jbplugin-methylation/issues"
+    },
+    "ignore": [
     "node_modules",
     "test"
   ],
-  "directories": {
-    "test": "test"
-  },
-  "homepage": "https://github.com/bhofmei/jbplugin-methylation#readme",
-  "devDependencies": {
-    "jasmine": "^2.7.0",
-    "jbrowse" : "git+https://github.com/bhofmei/jbrowse"
-  }
+    "directories": {
+        "test": "test"
+    },
+    "homepage": "https://github.com/bhofmei/jbplugin-methylation#readme",
+    "devDependencies": {
+        "jasmine": "^2.7.0",
+        "jbrowse": "git+https://github.com/bhofmei/jbrowse"
+    }
 }

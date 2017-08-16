@@ -72,7 +72,7 @@ define([
           });
         }
         // register the track types
-        /*browser.registerTrackType({
+        browser.registerTrackType({
                 label: 'MethylPlot',
                 type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
             });
@@ -84,7 +84,7 @@ define([
                 label: 'MethylHTMLPlot',
                 type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
             });
-        //*/
+        //
         browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
           browser.hideCGButton = new dijitButton({

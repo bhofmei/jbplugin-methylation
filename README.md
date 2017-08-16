@@ -26,6 +26,10 @@ If that doesn't work, add this to _jbrowse_conf.json_:
     "plugins" : {
         "MethylationPlugin" : { "location" : "plugins/MethylationPlugin" }
     }
+    
+**DO NOT ADD THE PLUGIN TO BOTH!**
+    
+**NOTE**: The plugin location folder can be named differently, i.e. _jbplugin-methylation_, but the plugin ID MUST be `MethylationPlugin` for the plugin to work correctly.
 
 ## Test
 Sample data is included in the plugin to test that the plugin is working properly. With `URL` as the URL path to the JBrowse instance, navigate a web browser to `URL/index.html?data=plugins/MethylationPlugin/test/data`.

@@ -1,4 +1,4 @@
-define('MethylationPlugin/main', [
+define([
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
@@ -72,7 +72,7 @@ define('MethylationPlugin/main', [
           });
         }
         // register the track types
-        browser.registerTrackType({
+        /*browser.registerTrackType({
                 label: 'MethylPlot',
                 type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
             });
@@ -84,7 +84,7 @@ define('MethylationPlugin/main', [
                 label: 'MethylHTMLPlot',
                 type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
             });
-        //
+        //*/
         browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
           browser.hideCGButton = new dijitButton({

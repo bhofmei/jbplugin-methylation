@@ -5,3 +5,4 @@ bin/bedSort
 bin/bigWigToBedGraph
 node_modules
 npm-debug.log
+built

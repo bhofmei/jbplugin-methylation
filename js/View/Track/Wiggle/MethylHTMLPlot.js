@@ -29,7 +29,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
 
     return declare([HTMLFeatures, YScaleMixin], {
 
-      constructor: function (arguments) {
+      constructor: function (args) {
         this.height = this.config.maxHeight;
         var thisB = this;
         array.forEach(registry.toArray(), function (x) {
@@ -433,7 +433,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
             ]);
         }
         return options;
-      },
+      }
 
     });
   });

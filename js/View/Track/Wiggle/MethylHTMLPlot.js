@@ -50,7 +50,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
         array.forEach(styleOmit, function (elt) {
           delete inher.style[elt];
         });
-        var c = Util.deepUpdate(inher, {
+        var updated = {
           showCG: true,
           showCHG: true,
           showCHH: true,
@@ -61,13 +61,17 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           style: {
             className: 'feature-methyl',
             origin_color: 'black',
-            cg_color: '#A36085',
-            chg_color: '#0072B2',
-            chh_color: '#CF8F00'
+            cg_color: '#A36085'
           },
           yScalePosition: 'center'
-        });
-        return c;
+        };
+        if(thisB._isAnimal()){
+          updated.style.ch_color = '#88C043'
+        } else {
+          updated.style.chg_color = '#0072B2';
+          updated.style.chh_color = '#CF8F00';
+        }
+        return Util.deepUpdate(inher, updated);
       },
 
       _isAnimal: function(){

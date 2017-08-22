@@ -1,6 +1,9 @@
 Release Notes for Methylation Plugin
 
-# Version 3.3.1 - Aug 17, 2017
+# version 3.1.2 - Aug 22, 2017
+- fixed bug with animal coloring
+
+# Version 3.1.1 - Aug 17, 2017
 - minor bug fixes
 
 # Version 3.1.0 - Aug 8, 2017

@@ -53,13 +53,13 @@ define([
       constructor: function (args) {
 
         console.log('MethylationPlugin starting');
-        this.config.version = '3.1.0';
+        this.config.version = '3.1.2';
         // create the hide/show button after genome view initialization
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;
         var browser = this.browser;
         this.config.isAnimal = false;
-        if (browser.config.isAnimal === true || args.config.isAnimal === true) {
+        if (browser.config.isAnimal === true || args.isAnimal === true) {
           this.config.isAnimal = true;
         }
         // if animal, extend new default config functions for MethylPlot and MethylXYPlot

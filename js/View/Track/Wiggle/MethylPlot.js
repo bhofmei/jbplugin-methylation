@@ -51,25 +51,29 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
 
         _defaultConfig: function () {
           var thisB = this;
-          return Util.deepUpdate(
-            dojo.clone(this.inherited(arguments)), {
+          var updated = {
               logScaleOption: false,
               methylatedOption: false,
               max_score: 1,
               min_score: -1,
               style: {
                 origin_color: 'gray',
-                cg_color: '#A36085',
-                chg_color: '#0072B2',
-                chh_color: '#CF8F00'
+                cg_color: '#A36085'
               },
               showCG: true,
               showCHG: true,
               showCHH: true,
               showMethylatedOnly: false,
               isAnimal: thisB._isAnimal()
-            }
-          );
+            };
+          if(thisB._isAnimal()){
+            updated.style.ch_color = '#88C043';
+          } else {
+            updated.style.chg_color = '#0072B2';
+            updated.style.chh_color = '#CF8F00';
+          }
+          return Util.deepUpdate(
+            dojo.clone(this.inherited(arguments)), updated);
         },
 
       _isAnimal: function(){

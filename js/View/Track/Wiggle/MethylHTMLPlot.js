@@ -54,7 +54,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           showCG: true,
           showCHG: true,
           showCHH: true,
-          showMethylatedOnly: false,
+          showMethylatedOnly: true,
           isAnimal: thisB._isAnimal(),
           methylatedOption: false,
           maxHeight: 100,

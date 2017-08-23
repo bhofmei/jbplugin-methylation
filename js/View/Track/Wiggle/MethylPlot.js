@@ -63,7 +63,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
               showCG: true,
               showCHG: true,
               showCHH: true,
-              showMethylatedOnly: false,
+              showMethylatedOnly: true,
               isAnimal: thisB._isAnimal()
             };
           if(thisB._isAnimal()){

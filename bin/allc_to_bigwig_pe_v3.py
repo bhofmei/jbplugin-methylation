@@ -1,7 +1,7 @@
 import sys, math, multiprocessing, subprocess, os
 
 
-# Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+# Usage: python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
 
 # NOTE: allc file contains the methylation information for all chromosomes
 
@@ -171,7 +171,7 @@ def parseInputs( argv ):
 	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, isSort )
 
 def printHelp():
-	print ("Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all | -allz] [-L=labels] [-o=out_id] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*")
+	print ("Usage: python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_id] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*")
 	print( 'Converts allC files to context-specific BigWig files' )
 	print( 'Note: bedGraphToBigWig and bedSort programs must be in the path' )
 	print( 'Required:' )

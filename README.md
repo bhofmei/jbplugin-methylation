@@ -210,7 +210,6 @@ Using the animal coloring scheme is enforced hierarchically. Configurations spec
 Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
 
 ## Future Plans
-- corrected global statistics
 - improved documentation for the different versions
 
 ## Getting bedGraphToBigWig and bedSort

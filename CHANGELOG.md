@@ -1,91 +1,96 @@
-Release Notes for Methylation Plugin
+# Release Notes for Methylation Plugin
 
-# version 3.1.2 - Aug 22, 2017
-- fixed bug with animal coloring
+## [Unreleased]
 
-# Version 3.1.1 - Aug 17, 2017
+## [v3.2.0] - 2017-08-29
+- UPDATED stats for tracks
+  - context specific bases covered, min, max, and mean
+  - overall bases covered and mean
+
+## [v3.1.2] - 2017-08-22
+- FIXED bug with animal coloring
+
+## [v3.1.1] - 2017-08-17
 - minor bug fixes
 
-# Version 3.1.0 - Aug 8, 2017
-
-- added HTML style methylation tracks
+## [v3.1.0] - 2017-08-08
+- ADDED HTML style methylation tracks
     - each feature is now a html div element not painted to the canvas
     - this will be beneficial for screenshots since html div elements are editable in pdf/svg format
 
-# Version 3.0.3 - Aug 2, 2017
+## [v3.0.3] - 2017-08-02
 - minor bug fix with methylated option checkbox not being destroyed on chrm change
 
-# Version 3.0.2 - Jul 13, 2017
-- Fixed error where the String method "includes" was not being supported by phantomJS
+## [v3.0.2] - 2017-07-13
+- FIXED error where the String method "includes" was not being supported by phantomJS
 
-# Version 3.0.1 - Jun 20, 2017
+## [v3.0.1] - 2017-06-20
 - Changed default of MethylPlot to only show methylated positions by default
 - Added print statement to plugin constructor
 
-# Version 3.0.0 - Jun 19, 2017
-
+## [v3.0.0] - 2017-06-19
 - Updated MethylPlot with a "ShowMethylatedOnly" option, when checked, it only shows "methylated" sites
     - Methylated sites are determined by the value in the bigwig file
     - Methylated sites have "1" in the 7th decimal position; unmethylated sites have "0"
-    - This only works when bigwig files have been converted using `allc_to_bigwig_pe_v3.py" option
+    - This only works when bigwig files have been converted using `allc_to_bigwig_pe_v3.py` option
     - When this option is used for bigwig files converted with a different script, results will be incorrect.
 - For tracks converted with "allc_to_bigwig_pe_v3.py", use the "methylatedOption = true" in the configuration file.
 - Also updated to score mouseover score values are only shown for visible sites
 
-# Version 2.3.1 - Apr 12, 2017
-- added testing with jasmine
+## [v2.3.1] - 2017-04-12
+- ADDED testing with jasmine
 
-# Version 2.3.1 - Oct 3, 2016
-- fixed issue with track checkbox id's
+## [v2.3.1] - 2016-10-03
+- FIXED issue with track checkbox id's
 
-# Version 2.3.0 - Aug 26, 2016
-- animal-specific coloring
+## [v2.3.0] - 2016-08-26
+- ADDED animal-specific coloring
 
-# Version 2.2.1 - Aug 4, 2016
-- fixed bug where specifying methylation contexts was ignored
+## [v2.2.1] -2016-08-04
+- FIXED bug where specifying methylation contexts was ignored
 
-# Version 2.2.0 - Aug 3, 2016
+## [v2.2.0] - 2016-08-03
 - MethylBigWig uses lowest common zoom level between the contexts of the same track
   - previously, contexts could appear very different at certain zooms because they had different number of zoom levels
 
-# Version 2.1.2 - Jul 22, 2016
+## [v2.1.2] - 2016-07-22
 - showCG, showCHG, showCHH are part of default configs 
 - this change is important for the screenshot plugin to work properly
 
-# Version 2.1.1 - Jun 26, 2016
-- fixed error with track checkboxes id when changing reference sequences
+## [v2.1.1] - 2016-06-26
+- FIXED error with track checkboxes id when changing reference sequences
 
-# Version 2.1.0 - Jun 26, 2016
+## [v2.1.0] - 2016-06-26
 - Additional configuration option "context" that searches only for the specified contexts
   - necessary when not all (CG, CHG, CHH) are present
   - necessary when file extensions are not exactly '.bw.cg', '.bw.chg', '.bw.chh'
   - if not specified and file is missing, error is displayed on screen rather than ignoring the context
 
-# Version 2.0.1 - Jun 24, 2016
-- removed flag colors because they didn't work well with overlapping features
+## [v2.0.1] - 2016-06-24
+- REMOVED flag colors because they didn't work well with overlapping features
 
-# Verison 2.0.0 - Jun 24, 2016
+## [v2.0.0‘ - 2016-06-24
 - Prefered methylation visualization track type "MethylPlot" which uses the "MethylBigWig" Store
   - MethylBigWig looks for three separate BigWig files based on context
   - Fixes the issues with context for zooming
 - Older methylation track is still supported as the MethylXYPlot using BigWig store.
 - New methylation track also uses color in mouseover value flags
 
-# Version 1.2.2 - May 19, 2016
+## [v1.2.2] - 2016-05-19
 - corrected track menu check boxes so it agrees with the toolbar enable/disable
 - track menu checkboxes have color that indicate methylation context 
 
-# Version 1.2.1 - Feb 25, 2016
-- Updated the methylation colors and buttons to be red-green color blind friendly
-- Updated allc_to_bigwig_pe.py script that renames chromosomes
+## [v1.2.1] - 2016-02-15
+- UPDATED the methylation colors and buttons to be red-green color blind friendly
+- UPDATED allc_to_bigwig_pe.py script that renames chromosomes
 
-# Version 1.2.0 - Feb 7, 2016
-- Added toolbar buttons to turn on/off methylation contexts for all tracks
+## [v1.2.0] - 2016-02-07
+- ADDED toolbar buttons to turn on/off methylation contexts for all tracks
 
-# Version 1.1.0 - Feb 5, 2016
-- Added allC_to_bigwig.py script to be able to convert allC files
-- Added menu option to be able to change the height of all methylation tracks at once
+## [v1.1.0] - 2016-02-05
+- ADDED allC_to_bigwig.py script to be able to convert allC files
+- ADDED menu option to be able to change the height of all methylation tracks at once
 
-# Version 1.0.0 - Jan 24, 2016
+## [v1.0.0] - 2016-01-24
 - Initial release
 - Allows context-specific methylation data to be displayed in JBrowse

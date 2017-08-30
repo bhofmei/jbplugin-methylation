@@ -128,27 +128,30 @@ define('MethylationPlugin/Store/SeqFeature/MethylBigWig', [
           store._getGlobalStats(finishCallback, errorCallback);
         });
       },
+
       reformatStats: function (stats) {
+        var thisB = this;
         var out = {};
         var label = '';
         var totalBases = 0;
         var scoreTotal = 0;
         array.forEach(stats, function (stat) {
           label = stat.name.toUpperCase() + ' bases covered';
-          out[label] = stat.basesCovered;
+          out[label] = thisB._roundDecimal(stat.basesCovered, 6);
           totalBases += stat.basesCovered;
           scoreTotal += stat.scoreSum;
           label = stat.name.toUpperCase() + ' min score';
-          out[label] = stat.scoreMin;
+          out[label] = thisB._roundDecimal(stat.scoreMin, 6);
           label = stat.name.toUpperCase() + ' max score';
-          out[label] = stat.scoreMax;
+          out[label] = thisB._roundDecimal(stat.scoreMax, 6);
           label = stat.name.toUpperCase() + ' mean score';
-          out[label] = stat.scoreMean;
+          out[label] = thisB._roundDecimal(stat.scoreMean, 6);
         });
         out['total bases covered'] = totalBases;
-        out['total mean score'] = scoreTotal / totalBases;
+        out['total mean score'] = thisB._roundDecimal(scoreTotal / totalBases, 6);
         return out;
       },
+
       getRegionStats: function (query, successCallback, errorCallback) {
         var thisB = this;
         var finished = 0;
@@ -167,6 +170,10 @@ define('MethylationPlugin/Store/SeqFeature/MethylBigWig', [
         array.forEach(this.stores, function (store) {
           store.getRegionStats(query, finishCallback, errorCallback);
         });
+      },
+
+      _roundDecimal: function(number, places){
+        return +(Math.round(number + "e+"+places) + "e-" + places);
       }
 
     });

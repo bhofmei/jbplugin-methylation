@@ -48,20 +48,20 @@ define([
 
       _initializeProperties: function (args) {
         var opts = {};
-          opts['showM4C'] = {
-            id: 'show-m4c',
-            value: (args.config.showM4C === undefined ? true : args.config.showM4C),
-            classId: 'm4c',
-            label: 'Show m4C'
-          }
-          opts['showCG'] = {
-            id: 'show-cg',
-            value: (args.config.showCG === undefined ? true : args.config.showCG),
-            classId: 'cg',
-            label: 'Show CG'
-          }
+        opts['showM4C'] = {
+          id: 'show-m4c',
+          value: (args.config.showM4C === undefined ? true : args.config.showM4C),
+          classId: 'm4c',
+          label: 'Show m4C'
+        }
+        opts['showCG'] = {
+          id: 'show-cg',
+          value: (args.config.showCG === undefined ? true : args.config.showCG),
+          classId: 'cg',
+          label: 'Show CG'
+        }
         // CHG vs CHH
-        if(this.isAnimal){
+        if (this.isAnimal) {
           opts['showCH'] = {
             id: 'show-ch',
             value: (args.config.showCH === undefined ? true : args.config.showCH),
@@ -70,24 +70,24 @@ define([
           }
         } else {
           opts['showCHG'] = {
-            id: 'chow-chg',
+            id: 'show-chg',
             value: (args.config.showCHG === undefined ? true : args.config.showCHG),
             classId: 'chg',
             label: 'Show CHG'
           }
           opts['showCHH'] = {
-            id: 'chow-chh',
+            id: 'show-chh',
             value: (args.config.showCHH === undefined ? true : args.config.showCHH),
             classId: 'chh',
             label: 'Show CHH'
           }
         }
-          opts['showM6A'] = {
-            id: 'show-m6a',
-            value: (args.config.showM6A === undefined ? true : args.config.showM6A),
-            classId: 'm6a',
-            label: 'Show m6A'
-          }
+        opts['showM6A'] = {
+          id: 'show-m6a',
+          value: (args.config.showM6A === undefined ? true : args.config.showM6A),
+          classId: 'm6a',
+          label: 'Show m6A'
+        }
         return opts
       },
 
@@ -128,8 +128,8 @@ define([
             var ctxInfo = dialog.props[ctx];
             var val = ctxInfo.value;
             // change config
-            if (val !== undefined){
-              if(ctx === 'showCH'){
+            if (val !== undefined) {
+              if (ctx === 'showCH') {
                 track.config.showCHG = val;
                 track.config.showCHH = val;
               } else {
@@ -137,9 +137,28 @@ define([
               }
             }
             // fix check boxes
-            var mark = registry.byId(cssLabel + '-' + ctx.classId + '-checkbox');
-            if(mark)
-              mark.set('checked', val);
+            var l;
+            var mark;
+            if (track.config.isAnimal && (ctxInfo.classId === 'chg' || ctxInfo.classId === 'chh')) {
+              l = cssLabel + '-ch-checkbox';
+              mark = registry.byId(l);
+              if (mark)
+                mark.set('checked', (track.config.showCHG && track.config.showCHH));
+            } else if (!track.config.isAnimal && ctxInfo.classId === 'ch') {
+              l = cssLabel +'-chg-checkbox';
+              mark = registry.byId(l);
+              if (mark)
+                mark.set('checked', val);
+              l = cssLabel + '-chh-checkbox';
+              mark = registry.byId(l);
+              if (mark)
+                mark.set('checked', val);
+            } else {
+              l = cssLabel + '-' + ctxInfo.classId + '-checkbox';
+              mark = registry.byId(l);
+              if (mark)
+                mark.set('checked', val);
+            }
           } // end for ctx
           track.changed();
         }); // end for track
@@ -150,9 +169,11 @@ define([
         dojo.addClass(this.domNode, 'methyl-filter-dialog');
 
         // content pane
-        var outerPane = dom.create('div', {id: 'methyl-dialog-outer-pane'});
+        var outerPane = dom.create('div', {
+          id: 'methyl-dialog-outer-pane'
+        });
         var pane = dom.create('div', {
-        id: 'methyl-dialog-pane'
+          id: 'methyl-dialog-pane'
         }, outerPane);
         var ctx;
         for (ctx in this.props) {

@@ -62,6 +62,7 @@
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
          "urlTemplate" : "test_methyl_short_v3.bw",
        "isAnimal": true,
+       "context": ["cg", "ch"],
          "style" : {
             "height" : 50
          }

@@ -90,6 +90,18 @@
          "style" : {
             "height" : 50
          }
+      },
+     {
+         "category" : "Test data",
+         "key" : "Extended Modifications HTML",
+         "label" : "track_extended_mods_html",
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot",
+         "urlTemplate" : "test_methyl_short_v3.bw",
+       "context": ["cg","chg","chh","m4c","m6a"],
+         "style" : {
+            "height" : 50
+         }
       }
    ]
 }

@@ -160,8 +160,9 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             }
 
             fRect.t = toY(score);
+            fRect.t = Math.min(canvasHeight, Math.max(fRect.t, 0));
             //console.log(fRect.t+','+canvasHeight);
-            if (fRect.t <= canvasHeight && this._isShown(id, isMethylated)) { // if the rectangle is visible at all
+            if (this._isShown(id, isMethylated)) { // if the rectangle is visible at all
               context.fillStyle = this._getFeatureColor(id);
               if (fRect.t <= originY) // bar goes upward
                 context.fillRect(fRect.l, fRect.t, fRect.w, originY - fRect.t + 1);
@@ -375,12 +376,16 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           }
           if (id == 'cg')
             return this.config.showCG;
-          else if (this.config.isAnimal) // ch
+          else if (this.config.isAnimal && (id==='chg' || id==='chh')) // ch
             return (this.config.showCHG && this.config.showCHH)
           else if (id == 'chg')
             return this.config.showCHG;
           else if (id == 'chh')
             return this.config.showCHH;
+          else if(id === 'm4c')
+            return this.config.showM4C;
+          else if(id === 'm6a')
+            return this.config.showM6A;
           else
             return false;
         },
@@ -388,12 +393,16 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
         _getConfigColor: function (id) {
           if (id == 'cg')
             return this.config.style.cg_color;
-          else if (this.config.isAnimal) // ch
+          else if (this.config.isAnimal && (id==='chg' || id==='chh')) // ch
             return this.config.style.ch_color;
           else if (id == 'chg')
             return this.config.style.chg_color;
           else if (id == 'chh')
             return this.config.style.chh_color;
+          else if (id == 'm4c')
+            return this.config.style.m4c_color;
+          else if (id == 'm6a')
+            return this.config.style.m6a_color;
           else
             return 'black';
 

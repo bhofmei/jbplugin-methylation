@@ -57,7 +57,9 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           }
 
           //this.config.context = this.store.config.context || this.config.context;
-          if(this.store && this.store.hasOwnProperty('config') && this.store.config.hasOwnProperty('context'))
+          if(this.store && this.store.hasOwnProperty('config') && this.store.config.hasOwnProperty('context')){
+            this.config.context = this.store.config.context;
+          }
           this.cssLabel = this.config.label.replace(/\./g, '-');
 
           array.forEach(registry.toArray(), function (x) {

@@ -21,6 +21,7 @@ define([
     './View/Track/Wiggle/MethylXYPlot',
     './View/Track/Wiggle/MethylPlot',
      './View/Track/Wiggle/MethylHTMLPlot',
+  './View/Dialog/MethylFilterDialog',
     './Store/SeqFeature/MethylBigWig'
 ],
   function (
@@ -46,6 +47,7 @@ define([
     MethylXYPlot,
     MethylPlot,
     MethyHTMLPlot,
+    MethylFilterDialog,
     MethylBigWig
   ) {
 
@@ -98,48 +100,66 @@ define([
         //
         browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
-          browser.hideCGButton = new dijitButton({
-            title: "Show/Hide CG Methylation",
-            id: "hidecg-btn",
-            width: "22px",
-            onClick: lang.hitch(thisB, function (event) {
-              browser._showCGFunction();
-              dojo.stopEvent(event);
-            })
-          }, domConstruct.create('button', {}, navBox)); // end cg button
-          if (thisB.config.isAnimal) {
-            // Animal CH
-            browser.hideCHButton = new dijitButton({
-              title: "Show/Hide CH Methylation",
-              id: "hidech-btn",
-              width: "22px",
-              onClick: lang.hitch(thisB, function (event) {
-                browser._showCHFunction();
-                dojo.stopEvent(event);
-              })
-            }, domConstruct.create('button', {}, navBox)); // end ch button
+          if (thisB.config.extendedMods) {
+            // dialog button
+            browser.methylDialogButton = new dijitButton({
+              title: "Filter methylation tracks by context",
+              id: 'methyl-filter-btn',
+              width: '22px',
+              onClick: function () {
+                new MethylFilterDialog({
+                  browser: browser,
+                  config: thisB.config,
+                  setCallback: function (options) {
+                    thisB.config = options;
+                  }
+                }).show();
+              }
+            }, domConstruct.create('button', {}, navBox))
           } else {
-            // Plant CHG and CHH
-            browser.hideCHGButton = new dijitButton({
-              title: "Show/Hide CHG Methylation",
-              id: "hidechg-btn",
+            browser.hideCGButton = new dijitButton({
+              title: "Show/Hide CG Methylation",
+              id: "hidecg-btn",
               width: "22px",
               onClick: lang.hitch(thisB, function (event) {
-                browser._showCHGFunction();
+                browser._showCGFunction();
                 dojo.stopEvent(event);
               })
-            }, domConstruct.create('button', {}, navBox)); // end chg button
+            }, domConstruct.create('button', {}, navBox)); // end cg button
+            if (thisB.config.isAnimal) {
+              // Animal CH
+              browser.hideCHButton = new dijitButton({
+                title: "Show/Hide CH Methylation",
+                id: "hidech-btn",
+                width: "22px",
+                onClick: lang.hitch(thisB, function (event) {
+                  browser._showCHFunction();
+                  dojo.stopEvent(event);
+                })
+              }, domConstruct.create('button', {}, navBox)); // end ch button
+            } else {
+              // Plant CHG and CHH
+              browser.hideCHGButton = new dijitButton({
+                title: "Show/Hide CHG Methylation",
+                id: "hidechg-btn",
+                width: "22px",
+                onClick: lang.hitch(thisB, function (event) {
+                  browser._showCHGFunction();
+                  dojo.stopEvent(event);
+                })
+              }, domConstruct.create('button', {}, navBox)); // end chg button
 
-            browser.hideCHHButton = new dijitButton({
-              title: "Show/Hide CHH Methylation",
-              id: "hidechh-btn",
-              width: "22px",
-              onClick: lang.hitch(thisB, function (event) {
-                browser._showCHHFunction();
-                dojo.stopEvent(event);
-              })
-            }, domConstruct.create('button', {}, navBox)); // end chh button
-          }
+              browser.hideCHHButton = new dijitButton({
+                title: "Show/Hide CHH Methylation",
+                id: "hidechh-btn",
+                width: "22px",
+                onClick: lang.hitch(thisB, function (event) {
+                  browser._showCHHFunction();
+                  dojo.stopEvent(event);
+                })
+              }, domConstruct.create('button', {}, navBox)); // end chh button
+            }
+          } // end else
         }); // end after milestone
 
         // need to add option with browser global menus

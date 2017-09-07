@@ -70,19 +70,31 @@ define([
             _isAnimal: thisB._isAnimal
           });
         }
+        this.config.extendedMods = false;
+        if (args.extendedModifications === true) {
+          this.config.extendedMods = true;
+        }
+        if (this.config.extendedMods) {
+          lang.extend(MethylPlot, {
+            _extendedModConfig: thisB._extendedModConfig
+          });
+          lang.extend(MethyHTMLPlot, {
+            _extendedModConfig: thisB._extendedModConfig
+          });
+        }
         // register the track types
         browser.registerTrackType({
-                label: 'MethylPlot',
-                type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
-            });
+          label: 'MethylPlot',
+          type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
+        });
         browser.registerTrackType({
-                label: 'MethylXYPlot',
-                type: 'MethylationPlugin/View/Track/Wiggle/MethylXYPlot'
-            });
+          label: 'MethylXYPlot',
+          type: 'MethylationPlugin/View/Track/Wiggle/MethylXYPlot'
+        });
         browser.registerTrackType({
-                label: 'MethylHTMLPlot',
-                type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
-            });
+          label: 'MethylHTMLPlot',
+          type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
+        });
         //
         browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
@@ -288,6 +300,10 @@ define([
       },
 
       _isAnimal: function () {
+        return true;
+      },
+
+      _extendedModConfig: function () {
         return true;
       }
     });

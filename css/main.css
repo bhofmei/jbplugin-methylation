@@ -1,9 +1,20 @@
+/* extended modification filter button */
+#methyl-filter-btn{
+    height:17px;
+    width: 17px;
+    background-image: url("../img/methyl-filter.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
 /* hide CG button */
+
 span[widgetid=hidecg-btn] {
-  position:relative;
+  position: relative;
   top: -1px;
 }
-#hidecg-btn{
+
+#hidecg-btn {
   /* CG color: A36085 */
   height: 17px;
   width: 17px;
@@ -11,16 +22,20 @@ span[widgetid=hidecg-btn] {
   background-repeat: no-repeat;
   background-position: center center;
 }
+
 #hidecg-btn[hidden-cg] {
   background-image: url("../img/cg_disabled.png");
-} 
+}
+
 
 /* hide CHG button */
+
 span[widgetid=hidechg-btn] {
-  position:relative;
+  position: relative;
   top: -1px;
 }
-#hidechg-btn{
+
+#hidechg-btn {
   /* CHG color: 0072B2 */
   height: 17px;
   width: 17px;
@@ -28,16 +43,20 @@ span[widgetid=hidechg-btn] {
   background-repeat: no-repeat;
   background-position: center center;
 }
+
 #hidechg-btn[hidden-chg] {
   background-image: url("../img/chg_disabled.png");
-} 
+}
+
 
 /* hide CHH button */
+
 span[widgetid=hidechh-btn] {
-  position:relative;
+  position: relative;
   top: -1px;
 }
-#hidechh-btn{
+
+#hidechh-btn {
   /* CHH color: CF8F00 */
   height: 17px;
   width: 17px;
@@ -45,16 +64,20 @@ span[widgetid=hidechh-btn] {
   background-repeat: no-repeat;
   background-position: center center;
 }
+
 #hidechh-btn[hidden-chh] {
   background-image: url("../img/chh_disabled.png");
-} 
+}
+
 
 /* hide CH button */
+
 span[widgetid=hidech-btn] {
-  position:relative;
+  position: relative;
   top: -1px;
 }
-#hidech-btn{
+
+#hidech-btn {
   /* CH color: 88c043 */
   height: 17px;
   width: 17px;
@@ -62,32 +85,63 @@ span[widgetid=hidech-btn] {
   background-repeat: no-repeat;
   background-position: center center;
 }
+
 #hidech-btn[hidden-ch] {
   background-image: url("../img/ch_disabled.png");
 }
 
 tr.track-cg-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
-tr.track-cg-checkbox img.dijitCheckedMenuItemIcon{
-    background-image: url("../img/checkmark-cg.png")
-}
-tr.track-ch-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
-tr.track-ch-checkbox img.dijitCheckedMenuItemIcon{
-    background-image: url("../img/checkmark-ch.png")
-}
-tr.track-chg-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
-tr.track-chg-checkbox img.dijitCheckedMenuItemIcon{
-    background-image: url("../img/checkmark-chg.png")
-}
-tr.track-chh-checkbox  span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
-tr.track-chh-checkbox img.dijitCheckedMenuItemIcon{
-    background-image: url("../img/checkmark-chh.png")
+tr.track-cg-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-cg-checkbox.dijitCheckBox {
+  background-image: url("../img/checkmark-cg.png")
 }
 
+tr.track-ch-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-ch-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-ch-checkbox.dijitCheckBox {
+  background-image: url("../img/checkmark-ch.png")
+}
+
+tr.track-chg-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-chg-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-chg-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-chg.png")
+}
+
+tr.track-chh-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-chh-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-chh-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-chh.png")
+}
+
+tr.track-m4c-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-m4c-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-m4c-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-m4c.png")
+}
+
+tr.track-m6a-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-m6a-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-m6a-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-m6a.png")
+}
+
+/* dialog styling */
+#methyl-dialog-outer-pane{
+  text-align: center;
+}
+#methyl-dialog-pane{
+  text-align: left;
+  display: inline-block;
+}
+
+
 /* HTML css styling */
-.feature-methyl{
+
+.feature-methyl {
   cursor: default;
 }
 
-.methyl-origin{
+.methyl-origin {
   z-index: 100;
 }

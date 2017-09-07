@@ -213,7 +213,8 @@ define([
               return;
             track.config.showCG = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + '-cg-checkbox');
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark = registry.byId(cssLabel + '-cg-checkbox');
             if (mark)
               mark.set("checked", isShow);
           });
@@ -245,9 +246,20 @@ define([
             track.config.showCHG = isShow;
             track.config.showCHH = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + '-ch-checkbox');
-            if (mark)
-              mark.set("checked", isShow);
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark;
+            if (track.config.isAnimal) {
+              mark = registry.byId(cssLabel + '-ch-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            } else {
+              mark = registry.byId(cssLabel + '-chg-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+              mark = registry.byId(cssLabel + '-chh-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            }
           });
           // protect Hide button from clicks durng animation
           domAttr.set(dom.byId("hidech-btn"), "disabled", "");
@@ -276,9 +288,17 @@ define([
               return;
             track.config.showCHG = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + 'chg-checkbox');
-            if (mark)
-              mark.set("checked", isShow);
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark;
+            if (track.config.isAnimal) {
+              mark = registry.byId(cssLabel + '-ch-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            } else {
+              mark = registry.byId(cssLabel + '-chg-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            }
           });
           // protect Hide button from clicks durng animation
           domAttr.set(dom.byId("hidechg-btn"), "disabled", "");
@@ -307,9 +327,17 @@ define([
               return;
             track.config.showCHH = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + 'cg-checkbox');
-            if (mark)
-              mark.set("checked", isShow);
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark;
+            if (track.config.isAnimal) {
+              mark = registry.byId(cssLabel + '-ch-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            } else {
+              mark = registry.byId(cssLabel + '-chh-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            }
           });
           // protect Hide button from clicks durng animation
           domAttr.set(dom.byId("hidechh-btn"), "disabled", "");

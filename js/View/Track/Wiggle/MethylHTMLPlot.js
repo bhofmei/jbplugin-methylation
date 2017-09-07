@@ -49,7 +49,10 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           delete this.config.showM6A;
         }
 
-        this.config.context = this.store.config.context;
+         if(this.store && this.store.hasOwnProperty('config') && this.store.config.hasOwnProperty('context')){
+            this.config.context = this.store.config.context;
+         }
+
         this.cssLabel = this.config.label.replace(/\./g, '-');
 
         array.forEach(registry.toArray(), function (x) {
@@ -61,7 +64,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
 
       _defaultConfig: function () {
         var thisB = this;
-        var inher = dojo.clone(this.inherited(arguments));
+        var inher = lang.clone(this.inherited(arguments));
         var omit = ['maxFeatureSizeForUnderlyingRefSeq', 'maxFeatureScreenDensity', 'menuTemplate', 'events'];
         var styleOmit = ['centerChildrenVertically', 'label', 'description', '_defaultHistScale', '_defaultLabelScale', '_defaultDescriptionScale', 'arrowheadClass', 'minSubfeatureWidth', 'maxDescriptionLength', 'showLabels'];
         array.forEach(omit, function (elt) {
@@ -195,7 +198,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
 
         var curTrack = this;
 
-        var featCallback = dojo.hitch(this, function (feature) {
+        var featCallback = lang.hitch(this, function (feature) {
           var uniqueId = feature.id();
           if (!this._featureIsRendered(uniqueId)) {
             if (this.filterFeature(feature)) {
@@ -387,7 +390,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
         else
           return 'black';
       },
-      _inList(inAr, search) {
+      _inList: function(inAr, search) {
           return (inAr.indexOf(search) !== -1)
         },
 

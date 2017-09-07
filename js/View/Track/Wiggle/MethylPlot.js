@@ -29,7 +29,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
     XYPlot
   ) {
 
-    var XYPlot = declare([XYPlot],
+    var MethylPlot = declare([XYPlot],
 
       /**
        * Wiggle track that shows data with an X-Y plot for multiple mthylation contexts
@@ -37,7 +37,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
        * and https://github.com/cmdcolin/multibigwig
        */
       {
-        constructor: function () {
+        constructor: function (args) {
           var thisB = this;
 
           // handle chg/chh vs ch color
@@ -56,7 +56,8 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             delete this.config.showM6A;
           }
 
-          this.config.context = this.store.config.context;
+          //this.config.context = this.store.config.context || this.config.context;
+          if(this.store && this.store.hasOwnProperty('config') && this.store.config.hasOwnProperty('context'))
           this.cssLabel = this.config.label.replace(/\./g, '-');
 
           array.forEach(registry.toArray(), function (x) {
@@ -184,7 +185,6 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           var toY = lang.hitch(this, function (val) {
             return canvasHeight * (1 - dataScale.normalize(val)) / ratio;
           });
-          var thisB = this;
 
           // draw the origin line if it is not disabled
           var originColor = this.config.style.origin_color;
@@ -200,7 +200,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           }
         },
 
-        _inList(inAr, search) {
+        _inList: function(inAr, search) {
           return (inAr.indexOf(search) !== -1)
         },
 
@@ -317,7 +317,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           var scoreType = this.config.scoreType;
           var pixelValues = new Array(canvasWidth);
           // make an array of the max score at each pixel on the canvas
-          dojo.forEach(features, function (f, i) {
+          array.forEach(features, function (f, i) {
             var store = f.source;
             var id = f.get('source');
             var isMethylated;
@@ -414,5 +414,5 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
         }
       });
 
-    return XYPlot;
+    return MethylPlot;
   });

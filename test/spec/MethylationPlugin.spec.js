@@ -93,7 +93,7 @@ require([
       });
       expect(cg.length).toEqual(23);
       expect(chg.length).toEqual(12);
-      expect(chh.length).toEqual(18);
+      expect(chh.length).toEqual(17);
 
     });
 

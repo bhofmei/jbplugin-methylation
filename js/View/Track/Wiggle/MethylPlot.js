@@ -71,7 +71,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           var thisB = this;
           var inher = lang.clone(this.inherited(arguments));
           var styleOmit = ['pos_color', 'neg_color', ' variance_band_color'];
-          array.forEach(styleOmit, function(elt){
+          array.forEach(styleOmit, function (elt) {
             delete inher.style[elt];
           });
           var updated = {
@@ -213,7 +213,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             type: 'dijit/MenuSeparator'
           });
           var contexts = array.map(this.config.context, function (x) {
-            return x.toLowerCase()
+            return x.toLowerCase();
           });
           // m4C
           if (this._inList(contexts, 'm4c')) {
@@ -284,7 +284,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
               });
             }
           }
-           if (this._inList(contexts, 'm6a')) {
+          if (this._inList(contexts, 'm6a')) {
             options.push({
               label: 'Show m6A Methylation',
               type: 'dijit/CheckedMenuItem',
@@ -376,15 +376,15 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           }
           if (id == 'cg')
             return this.config.showCG;
-          else if (this.config.isAnimal && (id==='chg' || id==='chh')) // ch
+          else if (this.config.isAnimal && (id === 'chg' || id === 'chh')) // ch
             return (this.config.showCHG && this.config.showCHH)
           else if (id == 'chg')
             return this.config.showCHG;
           else if (id == 'chh')
             return this.config.showCHH;
-          else if(id === 'm4c')
+          else if (id === 'm4c')
             return this.config.showM4C;
-          else if(id === 'm6a')
+          else if (id === 'm6a')
             return this.config.showM6A;
           else
             return false;
@@ -393,7 +393,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
         _getConfigColor: function (id) {
           if (id == 'cg')
             return this.config.style.cg_color;
-          else if (this.config.isAnimal && (id==='chg' || id==='chh')) // ch
+          else if (this.config.isAnimal && (id === 'chg' || id === 'chh')) // ch
             return this.config.style.ch_color;
           else if (id == 'chg')
             return this.config.style.chg_color;
@@ -405,7 +405,6 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             return this.config.style.m6a_color;
           else
             return 'black';
-
         },
 
         _getFeatureColor: function (id) {

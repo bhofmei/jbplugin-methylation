@@ -10,7 +10,8 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
   'JBrowse/View/Track/WiggleBase',
   'JBrowse/View/Track/_YScaleMixin',
   'JBrowse/Util',
-  'JBrowse/View/Track/Wiggle/_Scale'
+  'JBrowse/View/Track/Wiggle/_Scale',
+  'JBrowse/View/Track/Wiggle/XYPlot'
 ],
   function (
     declare,
@@ -24,10 +25,11 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
     WiggleBase,
     YScaleMixin,
     Util,
-    Scale
+    Scale,
+     XYPlot
   ) {
 
-    var XYPlot = declare([WiggleBase, YScaleMixin],
+    var XYPlot = declare([XYPlot],
 
       /**
        * Wiggle track that shows data with an X-Y plot for multiple mthylation contexts
@@ -101,74 +103,6 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
 
         _extendedModConfig: function () {
           return false;
-        },
-
-        _getScaling: function (viewArgs, successCallback, errorCallback) {
-
-          this._getScalingStats(viewArgs, dojo.hitch(this, function (stats) {
-
-            //calculate the scaling if necessary
-            if (!this.lastScaling || !this.lastScaling.sameStats(stats) || this.trackHeightChanged) {
-
-              var scaling = new Scale(this.config, stats);
-
-              // bump minDisplayed to 0 if it is within 0.5% of it
-              if (Math.abs(scaling.min / scaling.max) < 0.005)
-                scaling.min = 0;
-
-              // update our track y-scale to reflect it
-              this.makeYScale({
-                fixBounds: true,
-                min: scaling.min,
-                max: scaling.max
-              });
-
-              // and finally adjust the scaling to match the ruler's scale rounding
-              scaling.min = this.ruler.scaler.bounds.lower;
-              scaling.max = this.ruler.scaler.bounds.upper;
-              scaling.range = scaling.max - scaling.min;
-
-              this.lastScaling = scaling;
-            }
-
-            successCallback(this.lastScaling);
-          }), errorCallback);
-        },
-
-        updateStaticElements: function (coords) {
-          //console.log('updateStaticElements');
-          this.inherited(arguments);
-          this.updateYScaleFromViewDimensions(coords);
-        },
-
-        fillTooManyFeaturesMessage: function (blockIndex, block, scale) {
-          this.fillMessage(
-            blockIndex,
-            block,
-            'Too much data to show' +
-            (scale >= this.browser.view.maxPxPerBp ? '' : '; zoom in to see detail') +
-            '.'
-          );
-        },
-
-        fillMessage: function (blockIndex, block, message, class_) {
-          domConstruct.empty(block.domNode);
-          var msgDiv = dojo.create(
-            'div', {
-              className: class_ || 'message',
-              innerHTML: message
-            }, block.domNode);
-          this.heightUpdate(dojo.position(msgDiv).h, blockIndex);
-        },
-
-        renderBlock: function (args) {
-          var featureScale = this.config.style.featureScale;
-          var scale = args.block.scale;
-          if (scale <= featureScale) { // don't draw, too zoomed-out, modeled after HTMLFeatures
-            this.fillTooManyFeaturesMessage(args.blockIndex, args.block, scale);
-          } else { // render features
-            this.inherited(arguments);
-          }
         },
 
         _draw: function (scale, leftBase, rightBase, block, canvas, features, featureRects, dataScale, pixels, spans) {
@@ -265,6 +199,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
 
         _trackMenuOptions: function () {
           var options = this.inherited(arguments);
+          options.splice(options.length - 1, 1)
           var track = this;
           //console.log(track);
           options.push.apply(

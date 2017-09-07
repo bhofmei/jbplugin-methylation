@@ -41,44 +41,67 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
         constructor: function () {
           var thisB = this;
 
+          // handle chg/chh vs ch color
+          if(this.config.isAnimal){
+            delete this.config.style.chg_color;
+            delete this.config.style.chh_color;
+          } else {
+            delete this.config.style.ch_color;
+          }
+
+          // handle extended mod colors and shows contexts
+          if (! thisB._extendedModConfig()) {
+            delete this.config.style.m4c_color;
+            delete this.config.style.m6a_color;
+            delete this.config.showM4C;
+            delete this.config.showM6A;
+          }
+
+          this.config.context = this.store.config.context;
+
           array.forEach(registry.toArray(), function (x) {
             var i = x.id;
-            if (i !== undefined && ( i.indexOf(thisB.config.label) >=0 ) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i)))
-            registry.byId(i).destroy();
+            if (i !== undefined && (i.indexOf(thisB.config.label) >= 0) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i)))
+              registry.byId(i).destroy();
           });
-
+          console.log(JSON.stringify(this.config));
         },
 
         _defaultConfig: function () {
           var thisB = this;
           var updated = {
-              logScaleOption: false,
-              methylatedOption: false,
-              max_score: 1,
-              min_score: -1,
-              style: {
-                origin_color: 'gray',
-                cg_color: '#A36085'
-              },
-              showCG: true,
-              showCHG: true,
-              showCHH: true,
-              showMethylatedOnly: true,
-              isAnimal: thisB._isAnimal()
-            };
-          if(thisB._isAnimal()){
-            updated.style.ch_color = '#88C043';
-          } else {
-            updated.style.chg_color = '#0072B2';
-            updated.style.chh_color = '#CF8F00';
-          }
+            logScaleOption: false,
+            methylatedOption: false,
+            max_score: 1,
+            min_score: -1,
+            style: {
+              origin_color: 'gray',
+              cg_color: '#A36085',
+              chg_color: '#0072B2',
+              chh_color: '#CF8F00',
+              ch_color: '#88C043',
+              m4c_color: '#',
+              m6a_color: '#'
+            },
+            showCG: true,
+            showCHG: true,
+            showCHH: true,
+            showM4C: true,
+            showM6A: true,
+            showMethylatedOnly: true,
+            isAnimal: thisB._isAnimal()
+          };
           return Util.deepUpdate(
             dojo.clone(this.inherited(arguments)), updated);
         },
 
-      _isAnimal: function(){
-        return false;
-      },
+        _isAnimal: function () {
+          return false;
+        },
+
+        _extendedModConfig: function () {
+          return false;
+        },
 
         _getScaling: function (viewArgs, successCallback, errorCallback) {
 

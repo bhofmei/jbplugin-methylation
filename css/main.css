@@ -114,16 +114,16 @@ div.dijit.dijitReset.dijitInline.track-chh-checkbox.dijitCheckBox{
   background-image: url("../img/checkmark-chh.png")
 }
 
-tr.track-m4c-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
-tr.track-m4c-checkbox img.dijitCheckedMenuItemIcon,
-div.dijit.dijitReset.dijitInline.track-m4c-checkbox.dijitCheckBox{
-  background-image: url("../img/checkmark-m4c.png")
+tr.track-4mc-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-4mc-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-4mc-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-4mc.png")
 }
 
-tr.track-m6a-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
-tr.track-m6a-checkbox img.dijitCheckedMenuItemIcon,
-div.dijit.dijitReset.dijitInline.track-m6a-checkbox.dijitCheckBox{
-  background-image: url("../img/checkmark-m6a.png")
+tr.track-6ma-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-6ma-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-6ma-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-6ma.png")
 }
 
 /* dialog styling */

@@ -50,10 +50,10 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
 
           // handle extended mod colors and shows contexts
           if (!thisB._extendedModConfig()) {
-            delete this.config.style.m4c_color;
-            delete this.config.style.m6a_color;
-            delete this.config.showM4C;
-            delete this.config.showM6A;
+            delete this.config.style['4mc_color'];
+            delete this.config.style['6ma_color'];
+            delete this.config.show4mC;
+            delete this.config.show6mA;
           }
 
           //this.config.context = this.store.config.context || this.config.context;
@@ -64,7 +64,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
 
           array.forEach(registry.toArray(), function (x) {
             var i = x.id;
-            if (i !== undefined && (i.indexOf(thisB.cssLabel) >= 0) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i) || /m\d.-checkbox/.test(i)))
+            if (i !== undefined && (i.indexOf(thisB.cssLabel) >= 0) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i) || /\dm.-checkbox/.test(i)))
               registry.byId(i).destroy();
           });
           //console.log(JSON.stringify(this.config));
@@ -88,14 +88,14 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
               chg_color: '#0072B2',
               chh_color: '#CF8F00',
               ch_color: '#88C043',
-              m4c_color: '#5ABFA9',
-              m6a_color: '#936EE7'
+              '4mc_color': '#5ABFA9',
+              '6ma_color': '#936EE7'
             },
             showCG: true,
             showCHG: true,
             showCHH: true,
-            showM4C: true,
-            showM6A: true,
+            show4mC: true,
+            show6mA: true,
             showMethylatedOnly: true,
             isAnimal: thisB._isAnimal()
           };
@@ -217,16 +217,17 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           var contexts = array.map(this.config.context, function (x) {
             return x.toLowerCase();
           });
+          var isExtended = track._extendedModConfig();
           // m4C
-          if (this._inList(contexts, 'm4c')) {
+          if (this._inList(contexts, '4mc')) {
             options.push({
-              label: 'Show m4C Methylation',
+              label: 'Show 4mC Methylation',
               type: 'dijit/CheckedMenuItem',
-              checked: track.config.showM4C,
-              id: track.cssLabel + '-m4c-checkbox',
-              class: 'track-m4c-checkbox',
+              checked: track.config.show4mC,
+              id: track.cssLabel + '-4mc-checkbox',
+              class: 'track-4mc-checkbox',
               onClick: function (event) {
-                track.config.showM4C = this.checked;
+                track.config.show4mC = this.checked;
                 track.changed();
               }
             });
@@ -234,7 +235,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           // CG
           if (this._inList(contexts, 'cg')) {
             options.push({
-              label: 'Show CG Methylation',
+              label: 'Show '+(isExtended ? '5mCG' : 'CG')+' Methylation',
               type: 'dijit/CheckedMenuItem',
               checked: track.config.showCG,
               id: track.cssLabel + '-cg-checkbox',
@@ -247,7 +248,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           }
           if (this.config.isAnimal && (this._inList(contexts, 'chg') || this._inList(contexts, 'chh'))) {
             options.push({
-              label: 'Show CH Methylation',
+              label: 'Show '+(isExtended ? '5mCH' : 'CH')+' Methylation',
               type: 'dijit/CheckedMenuItem',
               checked: (track.config.showCHG && track.config.showCHH),
               id: track.cssLabel + '-ch-checkbox',
@@ -261,7 +262,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
           } else {
             if (this._inList(contexts, 'chg')) {
               options.push({
-                label: 'Show CHG Methylation',
+                label: 'Show '+(isExtended ? '5mCHG' : 'CHG')+' Methylation',
                 type: 'dijit/CheckedMenuItem',
                 checked: track.config.showCHG,
                 id: track.cssLabel + '-chg-checkbox',
@@ -274,7 +275,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             }
             if (this._inList(contexts, 'chh')) {
               options.push({
-                label: 'Show CHH Methylation',
+                label: 'Show '+(isExtended ? '5mCHH' : 'CHH')+' Methylation',
                 type: 'dijit/CheckedMenuItem',
                 checked: track.config.showCHH,
                 id: track.cssLabel + '-chh-checkbox',
@@ -286,15 +287,15 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
               });
             }
           }
-          if (this._inList(contexts, 'm6a')) {
+          if (this._inList(contexts, '6ma')) {
             options.push({
-              label: 'Show m6A Methylation',
+              label: 'Show 6mA Methylation',
               type: 'dijit/CheckedMenuItem',
-              checked: track.config.showM6A,
-              id: track.cssLabel + '-m6a-checkbox',
-              class: 'track-m6a-checkbox',
+              checked: track.config.show6mA,
+              id: track.cssLabel + '-6ma-checkbox',
+              class: 'track-6ma-checkbox',
               onClick: function (event) {
-                track.config.showM6A = this.checked;
+                track.config.show6mA = this.checked;
                 track.changed();
               }
             });
@@ -384,10 +385,10 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             return this.config.showCHG;
           else if (id == 'chh')
             return this.config.showCHH;
-          else if (id === 'm4c')
-            return this.config.showM4C;
-          else if (id === 'm6a')
-            return this.config.showM6A;
+          else if (id === '4mc')
+            return this.config.show4mC;
+          else if (id === '6ma')
+            return this.config.show6mA;
           else
             return false;
         },
@@ -401,10 +402,10 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             return this.config.style.chg_color;
           else if (id == 'chh')
             return this.config.style.chh_color;
-          else if (id == 'm4c')
-            return this.config.style.m4c_color;
-          else if (id == 'm6a')
-            return this.config.style.m6a_color;
+          else if (id == '4mc')
+            return this.config.style['4mc_color'];
+          else if (id == '6ma')
+            return this.config.style['6ma_color'];
           else
             return 'black';
         },

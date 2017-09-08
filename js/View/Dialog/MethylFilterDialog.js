@@ -48,17 +48,17 @@ define([
 
       _initializeProperties: function (args) {
         var opts = {};
-        opts['showM4C'] = {
-          id: 'show-m4c',
-          value: (args.config.showM4C === undefined ? true : args.config.showM4C),
-          classId: 'm4c',
-          label: 'Show m4C'
+        opts['show4mC'] = {
+          id: 'show-4mc',
+          value: (args.config.show4mC === undefined ? true : args.config.show4mC),
+          classId: '4mc',
+          label: 'Show 4mC'
         }
         opts['showCG'] = {
           id: 'show-cg',
           value: (args.config.showCG === undefined ? true : args.config.showCG),
           classId: 'cg',
-          label: 'Show CG'
+          label: 'Show 5mCG'
         }
         // CHG vs CHH
         if (this.isAnimal) {
@@ -66,27 +66,27 @@ define([
             id: 'show-ch',
             value: (args.config.showCH === undefined ? true : args.config.showCH),
             classId: 'ch',
-            label: 'Show CH'
+            label: 'Show 5mCH'
           }
         } else {
           opts['showCHG'] = {
             id: 'show-chg',
             value: (args.config.showCHG === undefined ? true : args.config.showCHG),
             classId: 'chg',
-            label: 'Show CHG'
+            label: 'Show 5mCHG'
           }
           opts['showCHH'] = {
             id: 'show-chh',
             value: (args.config.showCHH === undefined ? true : args.config.showCHH),
             classId: 'chh',
-            label: 'Show CHH'
+            label: 'Show 5mCHH'
           }
         }
-        opts['showM6A'] = {
-          id: 'show-m6a',
-          value: (args.config.showM6A === undefined ? true : args.config.showM6A),
-          classId: 'm6a',
-          label: 'Show m6A'
+        opts['show6mA'] = {
+          id: 'show-6ma',
+          value: (args.config.show6mA === undefined ? true : args.config.show6mA),
+          classId: '6ma',
+          label: 'Show 6mA'
         }
         return opts
       },

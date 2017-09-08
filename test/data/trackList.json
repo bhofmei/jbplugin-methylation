@@ -87,7 +87,7 @@
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
          "urlTemplate" : "test_methyl_short_v3.bw",
-       "context": ["cg","chg","chh","m4c","m6a"],
+       "context": ["cg","chg","chh","4mc","6ma"],
          "style" : {
             "height" : 50
          }
@@ -99,7 +99,7 @@
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot",
          "urlTemplate" : "test_methyl_short_v3.bw",
-       "context": ["cg","chg","chh","m4c","m6a"],
+       "context": ["cg","chg","chh","4mc","6ma"],
          "style" : {
             "height" : 50
          }

@@ -65,13 +65,15 @@ def processFile( gffFileStr, chrmFileStr, outId, keepTemp, searchTerm, isSort, i
 	print( 'BigWig finished for {:s}.*'.format( bedGraphStr.replace( 'bedGraph', 'bw' ) ) )
 
 def readGFF( gffFileStr, bedGraphStr, searchTerm ):
-	modTypes = ['m4c', 'm5c', 'm6a']
+	outTypes = ['4mc', '5mc', '6ma']
+	validTypes = ['4mc', 'm4c', '5mc', 'm5c', '6ma', 'm6a']
+	validOut = [0, 0, 1, 1, 2, 2]
 	if not searchTerm.endswith( '=' ):
 		searchTerm += '='
 
-	bedGraphStrAr = [ bedGraphStr + '.' + x for x in  modTypes]
+	bedGraphStrAr = [ bedGraphStr + '.' + x for x in  outTypes]
 	bedGraphAr = [ open( x, 'w' ) for x in bedGraphStrAr ]
-	isUsed = [ False for x in modTypes ]
+	isUsed = [ False for x in outTypes ]
 
 	inFile = open( gffFileStr, 'r' )
 
@@ -83,9 +85,10 @@ def readGFF( gffFileStr, bedGraphStr, searchTerm ):
 		if line.startswith( '#' ) or len( lineAr ) < 9:
 			continue
 		featType = lineAr[2].lower()
-		featInt = indexOf( modTypes, featType )
+		featInt = indexOf( validTypes, featType )
 		if featInt == -1:
 			continue
+		outInt = validOut[featInt]
 		chrm = lineAr[0]
 		pos = int( lineAr[3] ) - 1
 		# get frac value
@@ -94,19 +97,21 @@ def readGFF( gffFileStr, bedGraphStr, searchTerm ):
 		if value != '':
 			# add to output
 			# (0) chrm (1) start (2) end (3) value
-			if isUsed[featInt] == False:
-				isUsed[featInt] = True
-			bedGraphAr[featInt].write( '{:s}\t{:d}\t{:d}\t{:s}\n'.format( chrm, pos, pos+1, value ) )
+			if isUsed[outInt] == False:
+				isUsed[outInt] = True
+			bedGraphAr[outInt].write( '{:s}\t{:d}\t{:d}\t{:s}\n'.format( chrm, pos, pos+1, value ) )
 
 	# end for line
 	inFile.close()
 
 	# determine used files, close and remove as necessary
 	outFilesAr = []
-	for i in range(len(modTypes)):
+	for i in range(len(outTypes)):
 		bedGraphAr[i].close()
 		if isUsed[i]:
 			outFilesAr += [bedGraphStrAr[i]]
+		else:
+			os.remove(bedGraphStrAr[i])
 
 	# end for i
 	return outFilesAr
@@ -211,7 +216,7 @@ def printHelp():
 	print()
 	print( 'Required:' )
 	print( 'chrm_file\ttab-delimited file with chromosome names and lengths,\n\t\ti.e. fasta index file' )
-	print( 'gff_file\tgff file with m4C and/or m6A positions on all chrms' )
+	print( 'gff_file\tgff file with 4mC and/or 6mA positions on all chrms' )
 	print()
 	print( 'Optional:' )
 	print( '-keep\t\tkeep intermediate files' )

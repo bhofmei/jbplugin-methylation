@@ -40,11 +40,11 @@ Sample data is included in the plugin to test that the plugin is working properl
 
 ## Plugin Configuration Options
 
-Plugin defaults are designed for WGBS of plant data.
+Plugin defaults are designed for WGBS (5mC) of plant data.
 
 Additional plugin configurations support 
 1. animal-vs-plant sequence context color schemes
-2. Extended base modifications m4C and m6A from SMRT
+2. Extended base modifications 4mC and 6mA from SMRT
 
 ### Animal-specific coloring
 While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see track configuration options below).
@@ -73,11 +73,11 @@ If plugin is activated in _jbrowse.conf_, do not set configuration in _jbrowse\_
 
 ### Extended base modifications
 SMRT is able to detect m4C and m6A at single base resolution.
-However it is still expensive and WGBS is extremely common, so visualization m4C and/or m6A is turned off by default.
+However it is still expensive and WGBS is extremely common, so visualization 4mC and/or 6mA is turned off by default.
 
 When used, these contexts are additional colored
-- m4C: light teal/cyan
-- m6A: purple
+- 4mC: light teal/cyan
+- 6mA: purple
 
 To turn on support for all species, change the plugin configuration in _jbrowse.conf_ or _jbrowse\_conf.json_ (but not both).
 
@@ -101,7 +101,7 @@ extendedModifications = true
 **This documentation is for version 3.** Versions 1 and 2 are still supported, but not recommended for use. For information about using version 1 and/or 2, see [Previous Versions](Previous-versions.md)
 - There will be a BigWig file for each context of interest
   - Default contexts: ["CG", "CHG" "CHH"]
-  - Also supported: ["m4C", "m6A"]
+  - Also supported: ["4mC", "6mA"]
   - Animal coloring uses CG and CH. CH context will have two BigWigs (one for CHG and one for CHH)
 - Includes support to be able to filter use all or only methylated sites within one track. This keeps the global view looking good when zoomed out but allows for better visualization when zoomed in.
 
@@ -159,9 +159,9 @@ Optional:
 
 For each input allC files _input.tsv_, with default parameters, this will create three output files: _input.bw.cg_, _input.bw.chg_, and _input.bw.chh_.
 
-#### m4C and m6A GFF Files
+#### 4mC and 6mA GFF Files
 - These GFF files have the following columns: chr, source, feature type, start, end, score, strand, frame, attributes
-  - Feature must be "m4C" or "m6A" to be included in output (one file for each)
+  - Feature must be "m4C"/"4mC" or "m6A"/"6mA" to be included in output (one file for each)
   - In the attributes, the "frac" attribute determines methylation level, i.e. height of bar.
 - All features are considered "methylated". If this needs changed, contact [Brigitte](bhofmei@gmail.com)
 - **Note**: When overlaying with allC/bismark C data, the output file names must be the same except for the extension. Use `-o=out_id` for corresponding m5C files "out\_id\_v3.bw.*"
@@ -173,7 +173,7 @@ Usage:  python3 gff_to_bigwig_pe_v3.py [-q] [-h] [-keep] [-sort] [-o=out_ids]
 Required:
 chrm_file       tab-delimited file with chromosome names and lengths,
                 i.e. fasta index file
-gff_file        gff file with m4C and/or m6A positions on all chrms
+gff_file        gff file with 4mC and/or 6mA positions on all chrms
 
 Optional:
 -keep           keep intermediate files
@@ -186,7 +186,7 @@ Optional:
 -p=num_proc     number of processors to use [default 1]
 ```
 
-For each GFF _input.gff_ which contains both m4C and m6A, with default paramters, this will create _input.bw.m4c_ and _input.bw.m6a_.
+For each GFF _input.gff_ which contains both m4C and m6A, with default paramters, this will create _input.bw.4mc_ and _input.bw.6ma_.
 
 ### JSON Track Specifications
 Track specifications are very similar to those for XYPlots (see JBrowse tutorial for more information). The _label_, _type_, and _urlTemplate_ must be specified. 
@@ -213,11 +213,11 @@ By default, the plugin will search for CG, CHG, and CHH contexts. If there is no
  "contexts" : ["cg", "chh"]
 ```
 
-#### Extended modifications (m4C and m6A)
+#### Extended modifications (4mC and 6mA)
 
 m4C and m6A must be specified to be used. When used with m5C (CG, CHG, CHH) methylation, all contexts must be specified and BigWig files for all extensions must exist.
 ```
- "contexts" : ["cg", "chg", "chh", "m4c", "m6a"]
+ "contexts" : ["cg", "chg", "chh", "4mc", "6ma"]
 ```
 
 #### Animal-vs-Plant coloring

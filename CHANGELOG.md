@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [v3.3.0] - 2017-09-07
+- FIXED issue with animal configuration coloring when coloring was track specific
+- FIXED issue not showing fully methylated positions
+- UPDATED track menu to only include checkboxes for contexts present
+- ADDED "extended modifications" option which supports m4C and m6A
+  - additional bigwig files
+  - even when activated, CG/CHG/CHH are the default contexts
+  - to include m4C and/or m6A, must be included in the "context" property of track configuration
+  - nav bar has single button that opens a dialog to filter sequence contexts
+- UPDATED test data to include context combinations and animal coloring
+- UPDATED bigwig so users can use "CH" context when specifying context in trackList, and converts to "CHG" and "CHH"
+
 ## [v3.2.0] - 2017-08-29
 - UPDATED stats for tracks
   - context specific bases covered, min, max, and mean

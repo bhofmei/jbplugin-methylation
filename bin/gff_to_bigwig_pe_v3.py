@@ -203,7 +203,22 @@ def parseInputs( argv ):
 	processInputs( gffFileAr, chrmFileStr, keepTmp, outIdAr, searchTerm, numProc, isSort, isPrint )
 
 def printHelp():
-	print( 'Usage: python3 gff_to_bigwig_pe_v3.py [-q] [-h] [-keep] [-sort] [-o=out_ids] [-p=num_proc] [-s=gff_search_term] <chrm_sizes> <gff_fille> [gff_file]*' )
+	print()
+	print( 'Usage:\tpython3 gff_to_bigwig_pe_v3.py [-q] [-h] [-keep] [-sort] [-o=out_ids]\n\t[-p=num_proc] [-s=gff_search_term] <chrm_sizes> <gff_fille> [gff_file]*' )
+	print()
+	print( 'Converts GFF files to context-specific BigWig files' )
+	print( 'Note: bedGraphToBigWig and bedSort programs must be in the path' )
+	print()
+	print( 'Required:' )
+	print( 'chrm_file\ttab-delimited file with chromosome names and lengths,\n\t\ti.e. fasta index file' )
+	print( 'gff_file\tgff file with m4C and/or m6A positions on all chrms' )
+	print()
+	print( 'Optional:' )
+	print( '-keep\t\tkeep intermediate files' )
+	print( '-sort\t\tcalls bedSort; add this option if bigwig conversion fails' )
+	print( '-s=gff_search\tGFF attribute which has methylation level\n\t\t[default "frac"]' )
+	print( '-o=out_id\toptional ID for output files [default from input file name]\n\t\tif one ID specified, applied to all input GFFs\n\t\tcomma-separated list IDs for multiple GFFs' )
+	print( '-p=num_proc\tnumber of processors to use [default 1]' )
 
 if __name__ == "__main__":
 	if len(sys.argv) < 3 :

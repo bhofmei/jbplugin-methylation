@@ -3,7 +3,9 @@
 # Methylation Plugin
 This is a JBrowse plugin
  
-This plugin is to be used with whole-genome bisulfite sequencing data. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track
+This plugin is to be used with whole-genome bisulfite sequencing (WGBS) data and/or SMRT to detect base modifications. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track.
+
+This plugin is color-blind friendly!
 
 ## Install
 
@@ -21,7 +23,7 @@ Add this to _jbrowse.conf_ under `[GENERAL]`:
     [ plugins.MethylationPlugin ]
     location = plugins/MethylationPlugin
 
-If that doesn't work, add this to _jbrowse_conf.json_:
+If that doesn't work, add this to _jbrowse\_conf.json_:
 
     "plugins" : {
         "MethylationPlugin" : { "location" : "plugins/MethylationPlugin" }
@@ -36,181 +38,228 @@ Sample data is included in the plugin to test that the plugin is working properl
 
 ![Demo image](img/demo_image.png)
 
-## Using Methylation Tracks
-### Versions
-- Previous versions are supported for backwards compatability but using the current version (v3) is suggested.
-- **Version 1*** is when all contexts are in a single BigWig file
-    - This caused problems with zooming in the browser, so version 2 was developed as a fix.
-    - Version 1 is still supported, but not recommended for use.
-- **Version 2** uses three BigWig files, one for each methylation context.
-    - The files need the same base name, like _my-file.bw_, and contexts are specified as additional extensions, i.e. _my-file.bw.cg_, _my-file.bw.chg_, and _my-file.bw.chh_.
-    - Visualization greatly depends on if the `-all` parameter is used when converting the raw allC/bismark file
-- **Version 3** corrects the confusion about visualizating all sites vs methylated sites only
-    - Similar to version 2 in that there are 3 BigWig files (one for each context)
-    - Includes support to be able to filter use all or only methylated sites within one track. This keeps the global view looking good when zoomed out but allows for better visualization when zoomed in.
-- Even for animals, who are interested in CG and CH, use the three contexts specified here. CHG and CHH are combined by the plugin to form CH context.
+## Plugin Configuration Options
 
-### HTML-style Track
+Plugin defaults are designed for WGBS of plant data.
+
+Additional plugin configurations support 
+1. animal-vs-plant sequence context color schemes
+2. Extended base modifications m4C and m6A from SMRT
+
+### Animal-specific coloring
+While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see track configuration options below).
+
+The default (and suggested) colors are:
+- CG: red
+- CHG: blue
+- CHH: gold
+- CH: green
+
+Using the animal coloring scheme is enforced hierarchically. Configurations specified at a higher level overpower lower-level specification. If not specified at a specific level, inherits the setting of the level below. 
+
+| level| location | general config syntax | plugin config syntax|
+|--|--|--|
+|*highest* | individual track config | `isAnimal=true` | | 
+| | _tracks.conf_ | `[general]`<br>`isAnimal=true` | `[plugins.MethylationPlugin`<br>`isAnimal=true`|
+| | _jbrowse.conf_ | `[general]` <br> `isAnimal=true` | `[plugins.MethylationPlugin`<br>`isAnimal=true` |
+|*lowest*| **default** | `isAnimal=false`| |
+
+Note that toolbar buttons are defined by _tracks.conf_ and _jbrowse.conf_.
+
+These can also be set in _trackList.json_ and _jbrowse\_conf.json_ using JSON sytanx.
+Specify in _tracks.conf_ OR _trackList.json_, **NOT BOTH**. Specifiy in _jbrowse.conf_ OR _jbrowse\_conf.json_, **NOT BOTH**.
+
+If plugin is activated in _jbrowse.conf_, do not set configuration in _jbrowse\_conf.json_ and visa-versa. Similarly with _tracks.conf_ and _trackList.json_.
+
+### Extended base modifications
+SMRT is able to detect m4C and m6A at single base resolution.
+However it is still expensive and WGBS is extremely common, so visualization m4C and/or m6A is turned off by default.
+
+When used, these contexts are additional colored
+- m4C: light teal/cyan
+- m6A: purple
+
+To turn on support for all species, change the plugin configuration in _jbrowse.conf_ or _jbrowse\_conf.json_ (but not both).
+
+In _jbrowse.conf_, 
+```
+[plugins.MethylationPlugin]
+...
+extendedModifications = true
+```
+
+To turn on/off support for a single species/dataset, change the plugin configuration in _tracks.conf_ or _trackList.json_ (but not both).
+
+In _tracks.conf_,
+```
+[plugins.MethylationPlugin]
+extendedModifications = true
+```
+
+## Using Methylation Tracks
+
+**This documentation is for version 3.** Versions 1 and 2 are still supported, but not recommended for use. For information about using version 1 and/or 2, see [Previous Versions](Previous-versions.md)
+- There will be a BigWig file for each context of interest
+  - Default contexts: ["CG", "CHG" "CHH"]
+  - Also supported: ["m4C", "m6A"]
+  - Animal coloring uses CG and CH. CH context will have two BigWigs (one for CHG and one for CHH)
+- Includes support to be able to filter use all or only methylated sites within one track. This keeps the global view looking good when zoomed out but allows for better visualization when zoomed in.
+
+### File Conversion
+Use the conversion program appropriate to your input file type. 
+_bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See [details below](Getting-bedGraphToBigWig-and-bedSort) for acquiring these programs.
+
+#### allC Files
+- allC files have these columns: chr, pos, strand, mc_class, mc_count, total, is_methylated
+- Methylated/unmethylated positions are denoted by the value.
+- All chromosomes need to be combined into one allC file.
+- You also need a file with chromosome sizes. This file should be tab-delimitated, one chromosome per line, with at least chromosome name and chromosome size. The genome's FASTA index (.fa.fai) file works well.
+- For a given genome (i.e. chromosome sizes), you can specify an unlimited number of allC files to be converted.
+
+```
+Usage:  python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_id]
+        [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+
+Required:
+chrm_file     tab-delimited file with chromosome names and lengths,
+              i.e. fasta index file
+allc_file     allc file with all chrms and contexts
+
+Optional:
+-keep         keep intermediate files
+-sort         calls bedSort; add this option if bigwig conversion fails
+-L=labels     comma-separated list of labels to use for the allC files;
+              [default uses information from the allc file name]
+-o=out_id     optional identifier to be added to the output file names [default none]
+-p=num_proc   number of processors to use [default 1]
+```
+
+For each input allC files _allc\_input.tsv_, with default parameters, this will create three output files: _input.bw.cg_, _input.bw.chg_, and _input.bw.chh_.
+
+#### Bismark
+- Bismark files have the following columns: chr, pos, strand, methylated reads, total reads, C context, trinucleotide context
+- When filtering for methylated sites only, any site with at least 1 methylated read is considered "methylated"
+
+```
+Usage:  python3 bismark_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_id]
+        [-p=num_proc] <chrm_sizes>  <bismark_file> [bismark_file]*
+Required:
+chrm_file     tab-delimited file with chromosome names and lengths,
+              i.e. fasta index file
+allc_file     bismark file with all chrms and contexts
+
+Optional:
+-keep         keep intermediate files
+-sort         calls bedSort; add this option if bigwig conversion fails
+-L=labels     comma-separated list of labels to use for the allC files;
+              [default uses information from the allc file name]
+-o=out_id     optional identifier to be added to the output file names [default none]
+-p=num_proc   number of processors to use [default 1]
+```
+
+For each input allC files _input.tsv_, with default parameters, this will create three output files: _input.bw.cg_, _input.bw.chg_, and _input.bw.chh_.
+
+#### m4C and m6A GFF Files
+- These GFF files have the following columns: chr, source, feature type, start, end, score, strand, frame, attributes
+  - Feature must be "m4C" or "m6A" to be included in output (one file for each)
+  - In the attributes, the "frac" attribute determines methylation level, i.e. height of bar.
+- All features are considered "methylated". If this needs changed, contact [Brigitte](bhofmei@gmail.com)
+- **Note**: When overlaying with allC/bismark C data, the output file names must be the same except for the extension. Use `-o=out_id` for corresponding m5C files "out\_id\_v3.bw.*"
+
+```
+Usage:  python3 gff_to_bigwig_pe_v3.py [-q] [-h] [-keep] [-sort] [-o=out_ids]
+        [-p=num_proc] [-s=gff_search_term] <chrm_sizes> <gff_fille> [gff_file]*
+
+Required:
+chrm_file       tab-delimited file with chromosome names and lengths,
+                i.e. fasta index file
+gff_file        gff file with m4C and/or m6A positions on all chrms
+
+Optional:
+-keep           keep intermediate files
+-sort           calls bedSort; add this option if bigwig conversion fails
+-s=gff_search   GFF attribute which has methylation level
+                [default "frac"]
+-o=out_id       optional ID for output files [default from input file name]
+                if one ID specified, applied to all input GFFs
+                comma-separated list IDs for multiple GFFs
+-p=num_proc     number of processors to use [default 1]
+```
+
+For each GFF _input.gff_ which contains both m4C and m6A, with default paramters, this will create _input.bw.m4c_ and _input.bw.m6a_.
+
+### JSON Track Specifications
+Track specifications are very similar to those for XYPlots (see JBrowse tutorial for more information). The _label_, _type_, and _urlTemplate_ must be specified. 
+
+_urlTemplate_ is the path and filename up-to, but not including, the context-specific extension.
+
+For example, for files _path/my-file.bw.cg_, _path/my-file.bw.chg_, and _path/my-file.bw.chh_, use `"urlTemplate" : "path/my-file.bw"`.
+
+In _trackList.json_,
+```
+{  
+  "key" : "Wild Type Methylation",
+  "label" : "track_wild_type_methylation",
+  "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+  "urlTemplate" : "path/my-file.bw",
+  "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
+  "methylatedOption" : true
+}
+```
+
+#### Subset of contexts
+By default, the plugin will search for CG, CHG, and CHH contexts. If there is not a file for each context, specify only the contexts needed.
+```
+ "contexts" : ["cg", "chh"]
+```
+
+#### Extended modifications (m4C and m6A)
+
+m4C and m6A must be specified to be used. When used with m5C (CG, CHG, CHH) methylation, all contexts must be specified and BigWig files for all extensions must exist.
+```
+ "contexts" : ["cg", "chg", "chh", "m4c", "m6a"]
+```
+
+#### Animal-vs-Plant coloring
+To force animal sequence context coloring (CG and CH) for a track when plugin/species is not animal,
+```
+"isAnimal" : true
+```
+
+To force non-animal/plant sequence coloring (CG, CHG, CHH) for a track when plugin/species is animal,
+```
+"isAnimal" : false
+```
+
+See [Animal-specific coloring](#Animal-specific-coloring) for more details.
+
+### HTML-style Tracks
 - Using the HTML-style track is not recommended because it can be slow for large regions and/or lots of data.
 - However, HTML-style tracks are preferred when taking screenshots. 
   - The default methyl track type paints the basepair methylation (feature) on a HTML `canvas` element.
   - That's great for speed but is exported as an uneditable image.
   - In the HTML-style tracks,  each base (feature) is exported as an editable HTML `div` element
--  It is recommended you add all tracks as version 3 tracks and _only_ use HTML-style tracks when taking screenshots. 
+-  It is recommended you _only_ use HTML-style tracks when taking screenshots. 
 See this [JBrowse plugin](https://github.com/bhofmei/jbplugin-screenshot.git) which makes taking screenshots easy and is configured to work with this methylation plugin.
 - **Note**: The HTML-style track does allow for hiding/showing context and "methylated positions only" but does not support min and max score changes (default min: -1, max: 1).
+- To use an HTML style track, all configuration options are the same as above except "maxHeight" (vs "style.height") to set the track height and "type".
 
-### File Conversion
-The methylation tracks works best when the data is stored as BigWig file(s). File conversion is easy, though. Use the conversion program appropriate to your input file type. 
-_bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See details below for acquiring this program.  
-#### allC Files
-- allC files have these columns: chr, pos, strand, mc_class, mc_count, total, methylated
-- In v2, by default, only _methylated_ positions are included. Use the `-all` option to include all non-zero positions.
-- In v3, all non-zero positions are included. Methylated/unmethylated positions are denoted by the value.
-- All chromosomes need to be combined into one allC file.
-- You also need a file with chromosome sizes. This file should be tab-delimitated, one chromosome per line, with at least chromosome name and chromosome size. The genome's FASTA index (.fa.fai) file works well.
-- For a given genome (i.e. chromosome sizes), you can specify an unlimited number of allC files to be converted. 
-- Note: version 1 conversion renames reference sequences to a convention while version 2 does not.
-- Conversion Version 1:
-
-```
-Usage: python3 allc_old_bigwig_pe.py [-keep] [-no-clean] [-sort] [-all] 
-       [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*  
--keep           when on, keeps temporary files
--no-clean       does not check chromosome names match chrm file
--sort           calls bedSort; add this option if bigwig conversion fails
--all            use all positions with methylation not just methylated ones
--L=labels       comma-separated list of labels for incoming allC files  
--p=num_proc     number of processors to use [default 1]  
--o=outID        optional string to include in output file names
-```
-
-* Conversion Version 2:
-```
-Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] 
-       [-o=out_id] [-p=num_proc]<chrm_sizes>  <allC_file> [allC_file]*
--keep        keep intermediate files
--sort        calls bedSort; add this option if bigwig conversion fails
--all         use all positions with methylation [default methylated sites]
--allz        use all positions with coverage including 0's
--L=labels    comma-separated list of labels to use for the allC files;
-             defaults to using information from the allc file name
--o=out_id    optional identifier to be added to the output file names
--p=num_proc  number of processors to use [default 1]
-```
-* Conversion Version 3:
-```
-Usage:  python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-p=num_proc]
-        [-o=out_id] <chrm_sizes> <allC_file> [allC_file]*
--keep        keep intermediate files
--sort        calls bedSort; add this option if bigwig conversion fails
--L=labels    comma-separated list of labels to use for the allC files;
-             defaults to using information from the allc file name
--o=out_id    optional identifier to be added to the output file names
--p=num_proc  number of processors to use [default 1]
-```
-
-#### Bismark
-* Bismark files have the following columns: chr, pos, strand, methylated reads, total reads, C context, trinucleotide context
-* There is a script to convert bismark files to version 2 and 3
-* *Note*: for v3, when filtering for methylated sites only, any site with at least 1 methylated read is considered "methylated"
-
-* Conversion Version 2
-```
-Usage:  python3 bismark_to_bigwig_pe.py [-keep] [-sort] [-all] [-L=labels] 
-        [-o=out_id] [-p=num_proc] <chrm_sizes>  <bismark_file> [bismark_file]*
--keep        keep intermediate files
--sort        calls bedSort; add this option if bigwig conversion fails
--all         use all covered positions including 0s [default only includes mC > 1]
--L=labels    comma-separated list of labels to use for the allC files;
-             defaults to using information from the allc file name
--o=out_id    optional identifier to be added to the output file names
--p=num_proc  number of processors to use [default 1]
-```
-
-* Conversion Version 3
-```
-Usage:  python3 bismark_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_id]
-        [-p=num_proc] <chrm_sizes>  <bismark_file> [bismark_file]*
--keep        keep intermediate files
--sort        calls bedSort; add this option if bigwig conversion fails
--L=labels    comma-separated list of labels to use for the allC files;
-             defaults to using information from the allc file name
--o=out_id    optional identifier to be added to the output file names
--p=num_proc  number of processors to use [default 1]
-```
-
-### JSON Track Specifications
-Track specifications are very similar to those for XYPlots (see JBrowse tutorial for more information). The _label_, _type_, and _urlTemplate_ must be specified. 
-
-#### Version 1
-```
-{  
-  "key" : "Wild Type Methylation",
-  "label" : "track_wild_type_methylation",
-  "style" : { "height" : 50 },
-  "storeClass" : "JBrowse/Store/SeqFeature/BigWig",
-  "urlTemplate" : "path/to/bigwig_file.bw",
-  "type" : "MethylationPlugin/View/Track/Wiggle/MethylXYPlot"
-}
-```
-    
-#### Version 2
-
-_urlTemplate_ is the path and filename up-to, but not including, the context-specific extension. For example `"urlTemplate" : "path/my-file.bw"` from example above.
-```
-{  
-  "key" : "Wild Type Methylation",
-  "label" : "track_wild_type_methylation",
-  "style" : { "height" : 50 },
-  "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
-  "urlTemplate" : "path/to/bigwig_file.bw",
-  "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot"
-}
-```
-If there is not a file for all contexts (CG, CHG, and CHH), include the following in the track configuration and specify only the contexts needed. 
-
-```
- "contexts" : ["cg", "chh"]
-```
-
-#### Version 3
-
-Same as Version 2 except add this to configuration
-```
-"methylatedOption" : true
-```
-
-#### HTML-Style
 ```
 {
   "type" : "MethylationPlugin/View/Track/MethylHTMLPlot",
-  "urlTemplate" : "line1-G3-rep1_Chr5_short.bw",
-  "category" : "Test data",
   "maxHeight": 100,
-  "key" : "WT HTML Methylation",
-  "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
-  "label" : "track_html_methylation"
 }
 ```
 
-    
-### Animal-specific coloring
-While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see above).
+## Additional Features
 
-Using the animal coloring scheme is enforced hierarchically. Configurations specified at a higher level overpower lower-level specification. If not specified at a specific level, inherits the setting of the level below. 
+1. Turn on/off a sequence context for a specific track using the track's dropdown menu.
 
-| level| location | syntax|
-|--|--|--|
-|*highest* | individual track config | `isAnimal=true` |
-| | `tracks.conf` | `[general]`<br>`isAnimal=true` |
-| | `jbrowse.conf` | `[general]` <br> `isAnimal=true` |
-|*lowest*| **default** | `isAnimal=false`|
+2. Turn on/off sequence contexts for **all visible tracks**
 
-Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
-
-## Future Plans
-- improved documentation for the different versions
+  A. Without extended modifications, use sequence specific buttons in the toolbar
+  
+  B. With extended modifications, use the methylation filter button in the toolbar to open a dialog
 
 ## Getting bedGraphToBigWig and bedSort
 ### Option 1: Download manually

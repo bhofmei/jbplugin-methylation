@@ -4,6 +4,11 @@
       "type" : "Hash",
       "url" : "names/"
    },
+  "plugins":{
+    "MethylationPlugin": {
+      "extendedModifications": true
+    }
+  },
    "tracks" : [
       {
          "category" : "Test data",
@@ -32,6 +37,7 @@
          "category" : "Test data",
          "key" : "Wild Type Methylation",
          "label" : "track_wild_type_methylation",
+        "methylatedOption": true,
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
          "urlTemplate" : "test_methyl_short_v3.bw",
@@ -47,6 +53,56 @@
          "key" : "WT HTML Methylation",
          "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
          "label" : "track_html_methylation"
+      },
+     {
+         "category" : "Test data",
+         "key" : "Wild Type Methylation - animal",
+         "label" : "track_wild_type_methylation_animal",
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
+         "urlTemplate" : "test_methyl_short_v3.bw",
+       "isAnimal": true,
+       "context": ["cg", "ch"],
+         "style" : {
+            "height" : 50
+         }
+      },
+     {
+         "category" : "Test data",
+         "key" : "Wild Type Methylation - CG, CHH",
+         "label" : "track_wild_type_methylation_context",
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
+         "urlTemplate" : "test_methyl_short_v3.bw",
+       "isAnimal": false,
+         "style" : {
+            "height" : 50
+         },
+       "context": ["cg", "chh"]
+      },
+     {
+         "category" : "Test data",
+         "key" : "Extended Modifications",
+         "label" : "track_extended_mods",
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylPlot",
+         "urlTemplate" : "test_methyl_short_v3.bw",
+       "context": ["cg","chg","chh","m4c","m6a"],
+         "style" : {
+            "height" : 50
+         }
+      },
+     {
+         "category" : "Test data",
+         "key" : "Extended Modifications HTML",
+         "label" : "track_extended_mods_html",
+         "storeClass" : "MethylationPlugin/Store/SeqFeature/MethylBigWig",
+         "type" : "MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot",
+         "urlTemplate" : "test_methyl_short_v3.bw",
+       "context": ["cg","chg","chh","m4c","m6a"],
+         "style" : {
+            "height" : 50
+         }
       }
    ]
 }

@@ -28,9 +28,18 @@ define('MethylationPlugin/Store/SeqFeature/MethylBigWig', [
         if (args.config.context === undefined) {
           this.config.context = ['cg', 'chg', 'chh'];
         } else {
-          this.config.context = array.map(args.config.context, function (x) {
-            return x.toLowerCase()
-          })
+          var tmpCtx = array.map(args.config.context, function (x) {
+            return x.toLowerCase();
+          });
+          if (args.isAnimal || args.browser.config || (args.browser.plugins.hasOwnProperty('MethylationPlugin') && args.browser.plugins.MethylationPlugin.config.isAnimal)) {
+            var tmpInd = tmpCtx.indexOf('ch');
+            if (tmpInd !== -1) {
+              tmpCtx.splice(tmpInd, 1);
+              if (tmpCtx.indexOf('chg') === -1 && tmpCtx.indexOf('chh') === -1)
+                tmpCtx.push('chg', 'chh');
+            }
+          }
+          this.config.context = tmpCtx;
         }
         var newFiles = array.map(thisB.config.context, function (m) {
           return {
@@ -172,8 +181,8 @@ define('MethylationPlugin/Store/SeqFeature/MethylBigWig', [
         });
       },
 
-      _roundDecimal: function(number, places){
-        return +(Math.round(number + "e+"+places) + "e-" + places);
+      _roundDecimal: function (number, places) {
+        return +(Math.round(number + "e+" + places) + "e-" + places);
       }
 
     });

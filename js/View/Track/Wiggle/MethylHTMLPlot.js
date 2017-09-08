@@ -32,16 +32,39 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
       constructor: function (args) {
         this.height = this.config.maxHeight;
         var thisB = this;
+
+        // handle chg/chh vs ch color
+        if (this.config.isAnimal) {
+          delete this.config.style.chg_color;
+          delete this.config.style.chh_color;
+        } else {
+          delete this.config.style.ch_color;
+        }
+
+        // handle extended mod colors and shows contexts
+        if (!thisB._extendedModConfig()) {
+          delete this.config.style.m4c_color;
+          delete this.config.style.m6a_color;
+          delete this.config.showM4C;
+          delete this.config.showM6A;
+        }
+
+         if(this.store && this.store.hasOwnProperty('config') && this.store.config.hasOwnProperty('context')){
+            this.config.context = this.store.config.context;
+         }
+
+        this.cssLabel = this.config.label.replace(/\./g, '-');
+
         array.forEach(registry.toArray(), function (x) {
           var i = x.id;
-          if (i !== undefined && ( i.indexOf(thisB.config.label) >=0 ) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i)))
+          if (i !== undefined && (i.indexOf(thisB.config.label) >= 0) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i) || /m\d.-checkbox/.test(i)))
             registry.byId(i).destroy();
         });
       },
 
       _defaultConfig: function () {
         var thisB = this;
-        var inher = dojo.clone(this.inherited(arguments));
+        var inher = lang.clone(this.inherited(arguments));
         var omit = ['maxFeatureSizeForUnderlyingRefSeq', 'maxFeatureScreenDensity', 'menuTemplate', 'events'];
         var styleOmit = ['centerChildrenVertically', 'label', 'description', '_defaultHistScale', '_defaultLabelScale', '_defaultDescriptionScale', 'arrowheadClass', 'minSubfeatureWidth', 'maxDescriptionLength', 'showLabels'];
         array.forEach(omit, function (elt) {
@@ -54,6 +77,8 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           showCG: true,
           showCHG: true,
           showCHH: true,
+          showM4C: true,
+          showM6A: true,
           showMethylatedOnly: true,
           isAnimal: thisB._isAnimal(),
           methylatedOption: false,
@@ -61,20 +86,23 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           style: {
             className: 'feature-methyl',
             origin_color: 'black',
-            cg_color: '#A36085'
+            cg_color: '#A36085',
+            chg_color: '#0072B2',
+            chh_color: '#CF8F00',
+            ch_color: '#88C043',
+            m4c_color: '#5ABFA9',
+            m6a_color: '#936EE7'
           },
           yScalePosition: 'center'
         };
-        if(thisB._isAnimal()){
-          updated.style.ch_color = '#88C043'
-        } else {
-          updated.style.chg_color = '#0072B2';
-          updated.style.chh_color = '#CF8F00';
-        }
         return Util.deepUpdate(inher, updated);
       },
 
-      _isAnimal: function(){
+      _isAnimal: function () {
+        return false;
+      },
+
+      _extendedModConfig: function () {
         return false;
       },
 
@@ -128,12 +156,16 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
 
         if (source == 'cg')
           return this.config.showCG;
-        else if (this.config.isAnimal) // ch
+        else if (this.config.isAnimal && (source === 'chg' || source === 'chh')) // ch
           return (this.config.showCHG && this.config.showCHH);
         else if (source == 'chg')
           return this.config.showCHG;
         else if (source === 'chh')
           return this.config.showCHH;
+        else if (source === 'm4c')
+          return this.config.showM4C;
+        else if (source === 'm6a')
+          return this.config.showM6A;
         else
           return false;
 
@@ -166,7 +198,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
 
         var curTrack = this;
 
-        var featCallback = dojo.hitch(this, function (feature) {
+        var featCallback = lang.hitch(this, function (feature) {
           var uniqueId = feature.id();
           if (!this._featureIsRendered(uniqueId)) {
             if (this.filterFeature(feature)) {
@@ -345,96 +377,127 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
       _getConfigColor: function (id) {
         if (id == 'cg')
           return this.config.style.cg_color;
-        else if (this.config.isAnimal) // ch
+        else if (this.config.isAnimal && (id === 'chg' || id === 'chh')) // ch
           return this.config.style.ch_color;
         else if (id == 'chg')
           return this.config.style.chg_color;
         else if (id == 'chh')
           return this.config.style.chh_color;
+        else if (id == 'm4c')
+          return this.config.style.m4c_color;
+        else if (id == 'm6a')
+          return this.config.style.m6a_color;
         else
           return 'black';
-
       },
+      _inList: function(inAr, search) {
+          return (inAr.indexOf(search) !== -1)
+        },
 
       _trackMenuOptions: function () {
         var options = this.inherited(arguments);
-        options.splice(options.length - 2, 2);
-        //console.log(options);
+        options.splice(options.length - 2, 2)
         var track = this;
-        //console.log(track);
-        options.push.apply(
-          options, [
-            {
-              type: 'dijit/MenuSeparator'
-              },
-            {
-              label: 'Show CG Methylation',
+        // menu separator
+        options.push({
+          type: 'dijit/MenuSeparator'
+        });
+        var contexts = array.map(this.config.context, function (x) {
+          return x.toLowerCase();
+        });
+        // m4C
+        if (this._inList(contexts, 'm4c')) {
+          options.push({
+            label: 'Show m4C Methylation',
+            type: 'dijit/CheckedMenuItem',
+            checked: track.config.showM4C,
+            id: track.cssLabel + '-m4c-checkbox',
+            class: 'track-m4c-checkbox',
+            onClick: function (event) {
+              track.config.showM4C = this.checked;
+              track.changed();
+            }
+          });
+        }
+        // CG
+        if (this._inList(contexts, 'cg')) {
+          options.push({
+            label: 'Show CG Methylation',
+            type: 'dijit/CheckedMenuItem',
+            checked: track.config.showCG,
+            id: track.cssLabel + '-cg-checkbox',
+            class: 'track-cg-checkbox',
+            onClick: function (event) {
+              track.config.showCG = this.checked;
+              track.changed();
+            }
+          });
+        }
+        if (this.config.isAnimal && (this._inList(contexts, 'chg') || this._inList(contexts, 'chh'))) {
+          options.push({
+            label: 'Show CH Methylation',
+            type: 'dijit/CheckedMenuItem',
+            checked: (track.config.showCHG && track.config.showCHH),
+            id: track.cssLabel + '-ch-checkbox',
+            class: 'track-ch-checkbox',
+            onClick: function (event) {
+              track.config.showCHG = this.checked;
+              track.config.showCHH = this.checked;
+              track.changed();
+            }
+          });
+        } else {
+          if (this._inList(contexts, 'chg')) {
+            options.push({
+              label: 'Show CHG Methylation',
               type: 'dijit/CheckedMenuItem',
-              checked: track.config.showCG,
-              id: track.config.label + '-cg-checkbox',
-              class: 'track-cg-checkbox',
+              checked: track.config.showCHG,
+              id: track.cssLabel + '-chg-checkbox',
+              class: 'track-chg-checkbox',
               onClick: function (event) {
-                track.config.showCG = this.checked;
+                track.config.showCHG = this.checked;
                 track.changed();
               }
-                }
-            ]);
-        if (this.config.isAnimal) {
-          options.push.apply(
-            options, [{
-                label: 'Show CH Methylation',
-                type: 'dijit/CheckedMenuItem',
-                checked: (track.config.showCHG && track.config.showCHH),
-                id: track.config.label + '-ch-checkbox',
-                class: 'track-ch-checkbox',
-                onClick: function (event) {
-                  track.config.showCHG = this.checked;
-                  track.config.showCHH = this.checked;
-                  track.changed();
-                }
-                }
-            ]);
-        } else {
-          options.push.apply(
-            options, [{
-                label: 'Show CHG Methylation',
-                type: 'dijit/CheckedMenuItem',
-                checked: track.config.showCHG,
-                id: track.config.label + '-chg-checkbox',
-                class: 'track-chg-checkbox',
-                onClick: function (event) {
-                  track.config.showCHG = this.checked;
-                  track.changed();
-                }
-                },
-              {
-                label: 'Show CHH Methylation',
-                type: 'dijit/CheckedMenuItem',
-                checked: track.config.showCHH,
-                id: track.config.label + '-chh-checkbox',
-                class: 'track-chh-checkbox',
-                onClick: function (event) {
-                  track.config.showCHH = this.checked;
-                  track.changed();
-                }
-                }
-            ]);
+            });
+          }
+          if (this._inList(contexts, 'chh')) {
+            options.push({
+              label: 'Show CHH Methylation',
+              type: 'dijit/CheckedMenuItem',
+              checked: track.config.showCHH,
+              id: track.cssLabel + '-chh-checkbox',
+              class: 'track-chh-checkbox',
+              onClick: function (event) {
+                track.config.showCHH = this.checked;
+                track.changed();
+              }
+            });
+          }
+        }
+        if (this._inList(contexts, 'm6a')) {
+          options.push({
+            label: 'Show m6A Methylation',
+            type: 'dijit/CheckedMenuItem',
+            checked: track.config.showM6A,
+            id: track.cssLabel + '-m6a-checkbox',
+            class: 'track-m6a-checkbox',
+            onClick: function (event) {
+              track.config.showM6A = this.checked;
+              track.changed();
+            }
+          });
         }
         if (this.config.methylatedOption) {
-          options.push.apply(
-            options, [
-              {
-                label: 'Show Methylated Sites Only',
-                type: 'dijit/CheckedMenuItem',
-                checked: track.config.showMethylatedOnly,
-                id: track.config.label + '-methylated-checkbox',
-                //class: 'track-cg-checkbox',
-                onClick: function (event) {
-                  track.config.showMethylatedOnly = this.checked;
-                  track.changed();
-                }
-                }
-            ]);
+          options.push({
+            label: 'Show Methylated Sites Only',
+            type: 'dijit/CheckedMenuItem',
+            checked: track.config.showMethylatedOnly,
+            id: track.cssLabel + '-methylated-checkbox',
+            onClick: function (event) {
+              track.config.showMethylatedOnly = this.checked;
+              track.changed();
+            }
+          });
         }
         return options;
       }

@@ -21,6 +21,7 @@ define([
     './View/Track/Wiggle/MethylXYPlot',
     './View/Track/Wiggle/MethylPlot',
      './View/Track/Wiggle/MethylHTMLPlot',
+  './View/Dialog/MethylFilterDialog',
     './Store/SeqFeature/MethylBigWig'
 ],
   function (
@@ -46,12 +47,13 @@ define([
     MethylXYPlot,
     MethylPlot,
     MethyHTMLPlot,
+    MethylFilterDialog,
     MethylBigWig
   ) {
 
     return declare(JBrowsePlugin, {
       constructor: function (args) {
-        this.config.version = '3.2.0';
+        this.config.version = '3.3.0';
         console.log('MethylationPlugin starting - v' + this.config.version);
         // create the hide/show button after genome view initialization
         var baseUrl = this._defaultConfig().baseUrl;
@@ -70,64 +72,94 @@ define([
             _isAnimal: thisB._isAnimal
           });
         }
+        this.config.extendedMods = false;
+        if (args.extendedModifications === true) {
+          this.config.extendedMods = true;
+        }
+        if (this.config.extendedMods) {
+          lang.extend(MethylPlot, {
+            _extendedModConfig: thisB._extendedModConfig
+          });
+          lang.extend(MethyHTMLPlot, {
+            _extendedModConfig: thisB._extendedModConfig
+          });
+        }
         // register the track types
         browser.registerTrackType({
-                label: 'MethylPlot',
-                type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
-            });
+          label: 'MethylPlot',
+          type: 'MethylationPlugin/View/Track/Wiggle/MethylPlot'
+        });
         browser.registerTrackType({
-                label: 'MethylXYPlot',
-                type: 'MethylationPlugin/View/Track/Wiggle/MethylXYPlot'
-            });
+          label: 'MethylXYPlot',
+          type: 'MethylationPlugin/View/Track/Wiggle/MethylXYPlot'
+        });
         browser.registerTrackType({
-                label: 'MethylHTMLPlot',
-                type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
-            });
+          label: 'MethylHTMLPlot',
+          type: 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot'
+        });
         //
         browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
-          browser.hideCGButton = new dijitButton({
-            title: "Show/Hide CG Methylation",
-            id: "hidecg-btn",
-            width: "22px",
-            onClick: lang.hitch(thisB, function (event) {
-              browser._showCGFunction();
-              dojo.stopEvent(event);
-            })
-          }, domConstruct.create('button', {}, navBox)); // end cg button
-          if (thisB.config.isAnimal) {
-            // Animal CH
-            browser.hideCHButton = new dijitButton({
-              title: "Show/Hide CH Methylation",
-              id: "hidech-btn",
-              width: "22px",
-              onClick: lang.hitch(thisB, function (event) {
-                browser._showCHFunction();
-                dojo.stopEvent(event);
-              })
-            }, domConstruct.create('button', {}, navBox)); // end ch button
+          if (thisB.config.extendedMods) {
+            // dialog button
+            browser.methylDialogButton = new dijitButton({
+              title: "Filter methylation tracks by context",
+              id: 'methyl-filter-btn',
+              width: '22px',
+              onClick: function () {
+                new MethylFilterDialog({
+                  browser: browser,
+                  config: thisB.config,
+                  setCallback: function (options) {
+                    thisB.config = options;
+                  }
+                }).show();
+              }
+            }, domConstruct.create('button', {}, navBox))
           } else {
-            // Plant CHG and CHH
-            browser.hideCHGButton = new dijitButton({
-              title: "Show/Hide CHG Methylation",
-              id: "hidechg-btn",
+            browser.hideCGButton = new dijitButton({
+              title: "Show/Hide CG Methylation",
+              id: "hidecg-btn",
               width: "22px",
               onClick: lang.hitch(thisB, function (event) {
-                browser._showCHGFunction();
+                browser._showCGFunction();
                 dojo.stopEvent(event);
               })
-            }, domConstruct.create('button', {}, navBox)); // end chg button
+            }, domConstruct.create('button', {}, navBox)); // end cg button
+            if (thisB.config.isAnimal) {
+              // Animal CH
+              browser.hideCHButton = new dijitButton({
+                title: "Show/Hide CH Methylation",
+                id: "hidech-btn",
+                width: "22px",
+                onClick: lang.hitch(thisB, function (event) {
+                  browser._showCHFunction();
+                  dojo.stopEvent(event);
+                })
+              }, domConstruct.create('button', {}, navBox)); // end ch button
+            } else {
+              // Plant CHG and CHH
+              browser.hideCHGButton = new dijitButton({
+                title: "Show/Hide CHG Methylation",
+                id: "hidechg-btn",
+                width: "22px",
+                onClick: lang.hitch(thisB, function (event) {
+                  browser._showCHGFunction();
+                  dojo.stopEvent(event);
+                })
+              }, domConstruct.create('button', {}, navBox)); // end chg button
 
-            browser.hideCHHButton = new dijitButton({
-              title: "Show/Hide CHH Methylation",
-              id: "hidechh-btn",
-              width: "22px",
-              onClick: lang.hitch(thisB, function (event) {
-                browser._showCHHFunction();
-                dojo.stopEvent(event);
-              })
-            }, domConstruct.create('button', {}, navBox)); // end chh button
-          }
+              browser.hideCHHButton = new dijitButton({
+                title: "Show/Hide CHH Methylation",
+                id: "hidechh-btn",
+                width: "22px",
+                onClick: lang.hitch(thisB, function (event) {
+                  browser._showCHHFunction();
+                  dojo.stopEvent(event);
+                })
+              }, domConstruct.create('button', {}, navBox)); // end chh button
+            }
+          } // end else
         }); // end after milestone
 
         // need to add option with browser global menus
@@ -181,7 +213,8 @@ define([
               return;
             track.config.showCG = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + '-cg-checkbox');
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark = registry.byId(cssLabel + '-cg-checkbox');
             if (mark)
               mark.set("checked", isShow);
           });
@@ -213,9 +246,20 @@ define([
             track.config.showCHG = isShow;
             track.config.showCHH = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + '-ch-checkbox');
-            if (mark)
-              mark.set("checked", isShow);
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark;
+            if (track.config.isAnimal) {
+              mark = registry.byId(cssLabel + '-ch-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            } else {
+              mark = registry.byId(cssLabel + '-chg-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+              mark = registry.byId(cssLabel + '-chh-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            }
           });
           // protect Hide button from clicks durng animation
           domAttr.set(dom.byId("hidech-btn"), "disabled", "");
@@ -244,9 +288,17 @@ define([
               return;
             track.config.showCHG = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + 'chg-checkbox');
-            if (mark)
-              mark.set("checked", isShow);
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark;
+            if (track.config.isAnimal) {
+              mark = registry.byId(cssLabel + '-ch-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            } else {
+              mark = registry.byId(cssLabel + '-chg-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            }
           });
           // protect Hide button from clicks durng animation
           domAttr.set(dom.byId("hidechg-btn"), "disabled", "");
@@ -275,9 +327,17 @@ define([
               return;
             track.config.showCHH = isShow;
             track.changed();
-            var mark = registry.byId(track.config.label + 'cg-checkbox');
-            if (mark)
-              mark.set("checked", isShow);
+            var cssLabel = track.config.label.replace(/\./g, '-');
+            var mark;
+            if (track.config.isAnimal) {
+              mark = registry.byId(cssLabel + '-ch-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            } else {
+              mark = registry.byId(cssLabel + '-chh-checkbox');
+              if (mark)
+                mark.set("checked", isShow);
+            }
           });
           // protect Hide button from clicks durng animation
           domAttr.set(dom.byId("hidechh-btn"), "disabled", "");
@@ -288,6 +348,10 @@ define([
       },
 
       _isAnimal: function () {
+        return true;
+      },
+
+      _extendedModConfig: function () {
         return true;
       }
     });

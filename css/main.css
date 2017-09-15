@@ -120,6 +120,12 @@ div.dijit.dijitReset.dijitInline.track-4mc-checkbox.dijitCheckBox{
   background-image: url("../img/checkmark-4mc.png")
 }
 
+tr.track-5hmc-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
+tr.track-5hmc-checkbox img.dijitCheckedMenuItemIcon,
+div.dijit.dijitReset.dijitInline.track-5hmc-checkbox.dijitCheckBox{
+  background-image: url("../img/checkmark-5hmc.png")
+}
+
 tr.track-6ma-checkbox span.dijitInline.dijitIcon.dijitMenuItemIcon.dijitCheckedMenuItemIcon,
 tr.track-6ma-checkbox img.dijitCheckedMenuItemIcon,
 div.dijit.dijitReset.dijitInline.track-6ma-checkbox.dijitCheckBox{

@@ -82,6 +82,12 @@ define([
             label: 'Show 5mCHH'
           }
         }
+        opts['show5hmC'] = {
+          id: 'show-5hmc',
+          value: (args.config.show5hmC === undefined ? true : args.config.show5hmC),
+          classId: '5hmc',
+          label: 'Show 5hmC'
+        }
         opts['show6mA'] = {
           id: 'show-6ma',
           value: (args.config.show6mA === undefined ? true : args.config.show6mA),

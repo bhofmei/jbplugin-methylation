@@ -3,7 +3,7 @@
 # Methylation Plugin
 This is a JBrowse plugin
  
-This plugin is to be used with whole-genome bisulfite sequencing (WGBS) data and/or SMRT to detect base modifications. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track.
+This plugin is to be used with whole-genome bisulfite sequencing (WGBS) data, tet-assisted bisulfite sequencing (TAB-seq) and/or SMRT to detect base modifications. Unlike almost all other browsers, this plugin allows you to see all methylation contexts on one track.
 
 This plugin is color-blind friendly!
 
@@ -18,6 +18,7 @@ downloaded the latest release version at [releases](https://github.com/bhofmei/j
 Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _MethylationPlugin_
 
 ## Activate
+### Web-browser
 Add this to _jbrowse.conf_ under `[GENERAL]`:
 
     [ plugins.MethylationPlugin ]
@@ -32,6 +33,26 @@ If that doesn't work, add this to _jbrowse\_conf.json_:
 **DO NOT ADD THE PLUGIN TO BOTH!**
     
 **NOTE**: The plugin location folder can be named differently, i.e. _jbplugin-methylation_, but the plugin ID MUST be `MethylationPlugin` for the plugin to work correctly.
+
+### Desktop-version
+The plugin location folder **MUST** be named _MethylationPlugin_. When specifying location, you must use the **absolute** path to the plugin directory.
+
+To pre-load the plugin for a dataset, add to _tracks.conf_ for the dataset then open the data directory.
+```
+[plugins.MethylationPlug]
+location = full-path-to-plugin/MethylationPlugin
+```
+
+Or pre-load the plugin in _trackList.json_
+```
+"plugins" : {
+  "MethylationPlugin" : {
+    "location" : "full-path-to-plugin/MethylationPlugin" 
+  }
+}
+```
+
+You can also load the plugin after opening a data directory using the "Genome" -> "Open plugin" from the menu bar.
 
 ## Test
 Sample data is included in the plugin to test that the plugin is working properly. With `URL` as the URL path to the JBrowse instance, navigate a web browser to `URL/index.html?data=plugins/MethylationPlugin/test/data`.
@@ -50,7 +71,7 @@ Additional plugin configurations support
 While the plant world likes methylation broken into CG, CHG, and CHH, the animal world prefers CG and CH. For those only interested in CG, ignore this and be sure to specify only the CG context in the configuration (see track configuration options below).
 
 The default (and suggested) colors are:
-- CG: red
+- CG: dark pink
 - CHG: blue
 - CHH: gold
 - CH: green
@@ -72,11 +93,12 @@ Specify in _tracks.conf_ OR _trackList.json_, **NOT BOTH**. Specifiy in _jbrowse
 If plugin is activated in _jbrowse.conf_, do not set configuration in _jbrowse\_conf.json_ and visa-versa. Similarly with _tracks.conf_ and _trackList.json_.
 
 ### Extended base modifications
-SMRT is able to detect m4C and m6A at single base resolution.
-However it is still expensive and WGBS is extremely common, so visualization 4mC and/or 6mA is turned off by default.
+SMRT is able to detect m4C and m6A at single base resolution. Additionally, TAB-seq can detect 5hmC.
+However both are expensive and uncommon, so visualization 4mC, 5hmC, and/or 6mA is turned off by default.
 
 When used, these contexts are additional colored
-- 4mC: light teal/cyan
+- 4mC: teal/cyan
+- 5hmC: dark red
 - 6mA: purple
 
 To turn on support for all species, change the plugin configuration in _jbrowse.conf_ or _jbrowse\_conf.json_ (but not both).
@@ -101,7 +123,7 @@ extendedModifications = true
 **This documentation is for version 3.** Versions 1 and 2 are still supported, but not recommended for use. For information about using version 1 and/or 2, see [Previous Versions](Previous-versions.md)
 - There will be a BigWig file for each context of interest
   - Default contexts: ["CG", "CHG" "CHH"]
-  - Also supported: ["4mC", "6mA"]
+  - Also supported: ["4mC", "5hmC", "6mA"]
   - Animal coloring uses CG and CH. CH context will have two BigWigs (one for CHG and one for CHH)
 - Includes support to be able to filter use all or only methylated sites within one track. This keeps the global view looking good when zoomed out but allows for better visualization when zoomed in.
 
@@ -118,7 +140,7 @@ _bedGraphToBigWig_ and _bedSort_ (programs from UCSC) must be on your path. See 
 
 ```
 Usage:  python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_id]
-        [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+        [-c=base_mod] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
 
 Required:
 chrm_file     tab-delimited file with chromosome names and lengths,
@@ -131,10 +153,18 @@ Optional:
 -L=labels     comma-separated list of labels to use for the allC files;
               [default uses information from the allc file name]
 -o=out_id     optional identifier to be added to the output file names [default none]
+-c=base_mod   base modification for file extension; single modification for
+              Call input files, i.e. 5hmC; overrides default G,CHG,CHH output
 -p=num_proc   number of processors to use [default 1]
 ```
 
-For each input allC files _allc\_input.tsv_, with default parameters, this will create three output files: _input.bw.cg_, _input.bw.chg_, and _input.bw.chh_.
+##### For 5mC
+- Run `allc_to_bigwig_v3.py` as normal **without** specifying `-c=base_mod`
+- For each input allC files _allc\_input.tsv_, with default parameters, this will create three output files: _input.bw.cg_, _input.bw.chg_, and _input.bw.chh_.
+
+##### For 5hmC
+- Run `allc_to_bigwig_v3.py` as normal **specifying** `-c=5hmc`
+- For each input allC file _allc\_input.tsv, this will create one output file: _input.bw.5hmc_
 
 #### Bismark
 - Bismark files have the following columns: chr, pos, strand, methylated reads, total reads, C context, trinucleotide context
@@ -158,6 +188,8 @@ Optional:
 ```
 
 For each input allC files _input.tsv_, with default parameters, this will create three output files: _input.bw.cg_, _input.bw.chg_, and _input.bw.chh_.
+
+To run Bismark files for 5hmC, contact me.
 
 #### 4mC and 6mA GFF Files
 - These GFF files have the following columns: chr, source, feature type, start, end, score, strand, frame, attributes
@@ -213,13 +245,14 @@ By default, the plugin will search for CG, CHG, and CHH contexts. If there is no
  "contexts" : ["cg", "chh"]
 ```
 
-#### Extended modifications (4mC and 6mA)
+#### Extended modifications (4mC, 5hmC, and 6mA)
 
-m4C and m6A must be specified to be used. When used with m5C (CG, CHG, CHH) methylation, all contexts must be specified and BigWig files for all extensions must exist.
+4mC, 5hmC, and 6mA must be specified to be used. When used with 5mC (CG, CHG, CHH) methylation, all contexts must be specified and BigWig files for all extensions must exist.
 ```
- "contexts" : ["cg", "chg", "chh", "4mc", "6ma"]
+ "contexts" : ["cg", "chg", "chh", "4mc", "5hmc", "6ma"]
 ```
 
+Not all contexts need to be included. If only interested in 5mC and 5hmC, use ``"contexts" : ["cg", "chg", "chh", "5hmc"]```
 #### Animal-vs-Plant coloring
 To force animal sequence context coloring (CG and CH) for a track when plugin/species is not animal,
 ```

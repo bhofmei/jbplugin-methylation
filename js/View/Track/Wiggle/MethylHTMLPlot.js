@@ -44,8 +44,10 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
         // handle extended mod colors and shows contexts
         if (!thisB._extendedModConfig()) {
           delete this.config.style['4mc_color'];
+          delete this.config.style['5hmc_color'];
           delete this.config.style['6ma_color'];
           delete this.config.show4mC;
+          delete this.config.show5hmC
           delete this.config.show6mA;
         }
 
@@ -57,8 +59,8 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
 
         array.forEach(registry.toArray(), function (x) {
           var i = x.id;
-          if (i !== undefined && (i.indexOf(thisB.config.label) >= 0) && (/c.*-checkbox/.test(i) || /methylated-checkbox/.test(i) || /\dm.-checkbox/.test(i)))
-            registry.byId(i).destroy();
+          if (i !== undefined && (i.indexOf(thisB.cssLabel) >= 0) && (/c[g|h]{1,2}-checkbox/.test(i) || /methylated-checkbox/.test(i) || /\dh?m.-checkbox/.test(i)))
+              registry.byId(i).destroy();
         });
       },
 
@@ -78,6 +80,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           showCHG: true,
           showCHH: true,
           show4mC: true,
+          show5hmC: true,
           show6mA: true,
           showMethylatedOnly: true,
           isAnimal: thisB._isAnimal(),
@@ -91,6 +94,7 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
             chh_color: '#CF8F00',
             ch_color: '#88C043',
             '4mc_color': '#5ABFA9',
+            '5hmc_color': '#990623',
             '6ma_color': '#936EE7'
           },
           yScalePosition: 'center'
@@ -164,6 +168,8 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           return this.config.showCHH;
         else if (source === '4mc')
           return this.config.show4mC;
+        else if (source === '5hmc')
+          return this.config.show5hmC;
         else if (source === '6ma')
           return this.config.show6mA;
         else
@@ -385,6 +391,8 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
           return this.config.style.chh_color;
         else if (id == '4mc')
           return this.config.style['4mc_color'];
+        else if (id == '5hmc')
+          return this.config.style['5hmc_color'];
         else if (id == '6ma')
           return this.config.style['6ma_color'];
         else
@@ -474,6 +482,19 @@ define("MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot", [
               }
             });
           }
+        }
+        if (this._inList(contexts, '5hmc')) {
+          options.push({
+            label: 'Show 5hmC Methylation',
+            type: 'dijit/CheckedMenuItem',
+            checked: track.config.show5hmC,
+            id: track.cssLabel + '-5hmc-checkbox',
+            class: 'track-5hmc-checkbox',
+            onClick: function (event) {
+              track.config.show5hmC = this.checked;
+              track.changed();
+            }
+          });
         }
         if (this._inList(contexts, '6ma')) {
           options.push({

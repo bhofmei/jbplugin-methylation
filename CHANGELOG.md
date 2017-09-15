@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [v3.3.1] - 2017-09-15
+- ADDED 5hmC to extended modifications
+
 ## [v3.3.0] - 2017-09-07
 - FIXED issue with animal configuration coloring when coloring was track specific
 - FIXED issue not showing fully methylated positions

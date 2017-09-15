@@ -53,7 +53,7 @@ define([
 
     return declare(JBrowsePlugin, {
       constructor: function (args) {
-        this.config.version = '3.3.0';
+        this.config.version = '3.3.1';
         console.log('MethylationPlugin starting - v' + this.config.version);
         // create the hide/show button after genome view initialization
         var baseUrl = this._defaultConfig().baseUrl;

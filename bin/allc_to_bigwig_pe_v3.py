@@ -1,7 +1,7 @@
 import sys, math, multiprocessing, subprocess, os
 
 
-# Usage: python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+# Usage: python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-p=num_proc] [-c=base_mod]  <chrm_sizes>  <allC_file> [allC_file]*
 
 # NOTE: allc file contains the methylation information for all chromosomes
 
@@ -13,17 +13,17 @@ import sys, math, multiprocessing, subprocess, os
 
 NUMPROC=1
 
-def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, isSort ):
-	print( 'Keep temp files: {:s}\nSort bedGraph: {:s}'.format( str( keepTmp), str (isSort)))
+def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, baseMod, numProc, isSort ):
+	print( 'Keep temp files: {:s}\nSort bedGraph: {:s}\nContext/Modification: {:s}'.format( str( keepTmp), str (isSort), ('CG, CHG, CHH' if baseMod == None else baseMod)))
 	print( 'Begin processing files with {:d} processors'.format( numProc ) )
 	pool = multiprocessing.Pool( processes=numProc )
-	results = [ pool.apply_async( processFile, args=(allCFileAr[i], chrmFileStr, labelsAr[i], outID, keepTmp, isSort) ) for i in range(len(allCFileAr)) ]
+	results = [ pool.apply_async( processFile, args=(allCFileAr[i], chrmFileStr, labelsAr[i], outID, baseMod,  keepTmp, isSort) ) for i in range(len(allCFileAr)) ]
 	suc = [ p.get() for p in results ]
 
 	print( 'Done' )
 
 
-def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort):
+def processFile( allCFileStr, chrmFileStr, label, outID, baseMod, keepTmp, isSort):
 	if outID == None and label == None:
 		outID = allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
 	elif outID == None:
@@ -38,7 +38,12 @@ def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort):
 	print( 'Reading allC file {:s}'.format( allCFileStr ) )
 	bedGraphStr =  outID + '.bedGraph'
 
-	bedGraphAr = [bedGraphStr + '.' + x for x in ['cg','chg','chh'] ]
+	# default base modifications
+	if baseMod == None:
+		bedGraphAr = [bedGraphStr + '.' + x for x in ['cg','chg','chh'] ]
+	# custom modifications
+	else:
+		bedGraphAr = [bedGraphStr + '.' + x for x in [baseMod] ]
 	readAllC( allCFileStr, bedGraphAr )
 
 	if isSort:
@@ -65,21 +70,24 @@ def readAllC( allCFileStr, outFileAr ):
 
 	mTypes = [ 'CG', 'CHG', 'CHH' ]
 
+	isContext = (len(outFileAr) > 1)
+
 	for line in allCFile:
 		lineAr = line.rstrip().split('\t')
 		# (0) chr (1) pos (2) strand (3) mc class (4) mc_count (5) total
 		# (6) methylated
-		if len(lineAr) < 7 or lineAr[6].isdigit() == False:
+		if line.startswith('#') or len(lineAr) < 7 or lineAr[6].isdigit() == False:
 			continue
-		#elif (useZeros) or ( useAll and int(lineAr[4])> 0 ) or (int( lineAr[6]) ):
 		elif int(lineAr[4]) > 0:
 			chrm = lineAr[0]
 			pos = int( lineAr[1] ) - 1
-			methType = decodeMethType( lineAr[3] )
-			try:
-				mInd = mTypes.index( methType )
-			except ValueError:
-				continue
+			mInd = 0
+			if isContext:
+				methType = decodeMethType( lineAr[3] )
+				try:
+					mInd = mTypes.index( methType )
+				except ValueError:
+					continue
 			value = float( lineAr[4] ) / float( lineAr[5] )
 			isMeth = int(lineAr[6])
 			# adjust for negative strand
@@ -120,16 +128,17 @@ def processBedGraph( bedGraphStr, chrmFileStr ):
 
 
 def parseInputs( argv ):
-	# Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-L=labels] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*
+	# Usage: python3 allc_to_bigwig_pe.py [-keep] [-sort] [-L=labels] [-p=num_proc] [-c=base_mod] <chrm_sizes>  <allC_file> [allC_file]*
 
 	keepTmp = False
 	labelsAr = []
 	numProc = NUMPROC
 	isSort = False
 	outID = None
+	baseMod = None
 	startInd = 0
 
-	for i in range( min(4, len(argv)-2) ):
+	for i in range( min(5, len(argv)-2) ):
 		if argv[i] == '-keep':
 			keepTmp = True
 			startInd += 1
@@ -141,6 +150,9 @@ def parseInputs( argv ):
 			startInd += 1
 		elif argv[i].startswith( '-o=' ):
 			outID = argv[i][3:]
+			startInd += 1
+		elif argv[i].startswith( '-c=' ):
+			baseMod = argv[i][3:]
 			startInd += 1
 		elif argv[i].startswith( '-p=' ):
 			try:
@@ -168,7 +180,7 @@ def parseInputs( argv ):
 		print( "ERROR: number of labels doesn't match number of allC files" )
 		exit()
 
-	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, isSort )
+	processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, baseMod, numProc, isSort )
 
 def printHelp():
 	print ("Usage: python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-o=out_id] [-p=num_proc] <chrm_sizes>  <allC_file> [allC_file]*")
@@ -179,8 +191,9 @@ def printHelp():
 	print( 'allc_file\tallc file with all chrms and contexts' )
 	print( 'Optional:' )
 	print( '-keep\t\tkeep intermediate files' )
-	print( '-sort\tcalls bedSort; add this option if bigwig conversion fails' )
+	print( '-sort\t\tcalls bedSort; add this option if bigwig conversion fails' )
 	print( '-L=labels\tcomma-separated list of labels to use for the allC files;\n\t\tdefaults to using information from the allc file name' )
+	print( '-c=base_mod\tbase modification for file extension; single modification for\n\t\tCall input files, i.e. 5hmC; overrides default G,CHG,CHH output' )
 	print( '-o=out_id\toptional identifier to be added to the output file names' )
 	print( '-p=num_proc\tnumber of processors to use [default 1]' )
 

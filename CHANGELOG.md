@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [v3.3.2] - 2017-09-27
+- ADDED dialog mode which opens dialog immediately after loading tracks
+  - usefull for screenshots
+
 ## [v3.3.1] - 2017-09-15
 - ADDED 5hmC to extended modifications
 

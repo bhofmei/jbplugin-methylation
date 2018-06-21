@@ -22,7 +22,7 @@ def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, numProc, i
 	print( 'Done' )
 
 
-def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort, useAll ):
+def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort ):
 	if outID == None and label == None:
 		outID = allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
 	elif outID == None:
@@ -36,7 +36,7 @@ def processFile( allCFileStr, chrmFileStr, label, outID, keepTmp, isSort, useAll
 	# allC to bedGraphs
 	bedGraphStr =  outID + '.bedGraph'
 	bedGraphAr = [bedGraphStr + '.' + x for x in ['cg','chg','chh'] ]
-	readAllC( allCFileStr, bedGraphAr, useAll )
+	readAllC( allCFileStr, bedGraphAr )
 
 	if isSort:
 		print( 'Sorting bedGraph files' )

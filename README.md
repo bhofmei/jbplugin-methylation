@@ -7,9 +7,18 @@ This plugin is to be used with whole-genome bisulfite sequencing (WGBS) data, te
 
 This plugin is color-blind friendly!
 
+### JBrowse compatibility
+- Originally designed for JBrowse v1.12.x (which uses bower install)
+- Currently continuous integration and unit tests are run again JBrowse v1.12.6
+- JBrowse v1.13 introduced a new way to install/package JBrowse
+- Starting with JBrowse v1.13, the development version must be used
+- Has been manually tested for JBrowse v1.14.2-dev
+  - due to node/jbrowse incompatiblities issues, I was unable to with JBrowse v1.13.0 to v1.14.1
+  - likely works with these versions though
+
 ## Install
 
-For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:  
+For JBrowse v1.11.6+ in the _JBrowse/plugins_ folder, type:  
 ``git clone https://github.com/bhofmei/jbplugin-methylation.git MethylationPlugin``
 
 **or**
@@ -18,6 +27,7 @@ downloaded the latest release version at [releases](https://github.com/bhofmei/j
 Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _MethylationPlugin_
 
 ## Activate
+**Note:** For JBrowse v1.13+, you MUST use JBrowse v1.x.x-dev and run `setup.sh` after activating the plugin.
 ### Web-browser
 Add this to _jbrowse.conf_ under `[GENERAL]`:
 

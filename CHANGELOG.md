@@ -2,9 +2,12 @@
 
 ## [Unreleased]
 
-## [v3.3.2] - 2017-09-27
+## [v3.3.2] - 2018-07-10
 - ADDED dialog mode which opens dialog immediately after loading tracks
-  - usefull for screenshots
+  - useful for screenshots
+- FIXED error where no methylation was shown
+  - caused by change in JBrowse which didn't store BigWig source during feature creation
+  - added source information after feature is created if not already specified
 
 ## [v3.3.1] - 2017-09-15
 - ADDED 5hmC to extended modifications

@@ -53,7 +53,7 @@ define([
 
     return declare(JBrowsePlugin, {
       constructor: function (args) {
-        this.config.version = '3.3.1';
+        this.config.version = '3.3.2';
         console.log('MethylationPlugin starting - v' + this.config.version);
         // create the hide/show button after genome view initialization
         var baseUrl = this._defaultConfig().baseUrl;
@@ -83,6 +83,11 @@ define([
           lang.extend(MethyHTMLPlot, {
             _extendedModConfig: thisB._extendedModConfig
           });
+        }
+        // dialog demo
+        this.config.dialog = false;
+        if (args.dialogMode === true) {
+          this.config.dialog = true;
         }
         // register the track types
         browser.registerTrackType({
@@ -161,6 +166,18 @@ define([
             }
           } // end else
         }); // end after milestone
+
+        // dialog mode open dialog
+        if(this.config.dialog && this.config.extendedMods){
+          browser.afterMilestone('completely initialized', function(){
+            if(browser.view.tracks.length < 1){
+              setTimeout(function(){
+            var button = registry.byId('methyl-filter-btn');
+            button.onClick();
+                }, 700)
+            }
+        }); // end milestone completely initialized
+        }
 
         // need to add option with browser global menus
         if (browser.config.show_nav) {

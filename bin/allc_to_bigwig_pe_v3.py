@@ -1,4 +1,4 @@
-import sys, math, multiprocessing, subprocess, os
+import sys, math, multiprocessing, subprocess, os, gzip
 
 
 # Usage: python3 allc_to_bigwig_pe_v3.py [-keep] [-sort] [-L=labels] [-p=num_proc] [-c=base_mod]  <chrm_sizes>  <allC_file> [allC_file]*
@@ -24,12 +24,13 @@ def processInputs( allCFileAr, chrmFileStr, keepTmp, labelsAr, outID, baseMod, n
 
 
 def processFile( allCFileStr, chrmFileStr, label, outID, baseMod, keepTmp, isSort):
+	tmpAllc = allCFileStr.replace( '.tsv','' ).replace( 'allc_','' ).replace('.gz','').replace('.gzip', '')
 	if outID == None and label == None:
-		outID = allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
+		outID = tmpAllc
 	elif outID == None:
 		outID = label
 	elif label == None:
-		outID += '_' + allCFileStr.replace( '.tsv','' ).replace( 'allc_','' )
+		outID += '_' + tmpAllc
 	else:
 		outID += '_' + label
 	
@@ -65,7 +66,10 @@ def processFile( allCFileStr, chrmFileStr, label, outID, baseMod, keepTmp, isSor
 
 def readAllC( allCFileStr, outFileAr ):
 
-	allCFile = open( allCFileStr, 'r' )
+	if allCFileStr.endswith('.gz') or allCFileStr.endswith('.gzip'):
+		allCFile = gzip.open(allCFileStr, 'rt')
+	else:
+		allCFile = open( allCFileStr, 'r' )
 	outFileAr = [open( outFileStr, 'w' ) for outFileStr in outFileAr]
 
 	mTypes = [ 'CG', 'CHG', 'CHH' ]
@@ -188,7 +192,7 @@ def printHelp():
 	print( 'Note: bedGraphToBigWig and bedSort programs must be in the path' )
 	print( 'Required:' )
 	print( 'chrm_file\ttab-delimited file with chromosome names and lengths,\n\t\ti.e. fasta index file' )
-	print( 'allc_file\tallc file with all chrms and contexts' )
+	print( 'allc_file\tallc file with all chrms and contexts\n\t\tcan be gzip compressed' )
 	print( 'Optional:' )
 	print( '-keep\t\tkeep intermediate files' )
 	print( '-sort\t\tcalls bedSort; add this option if bigwig conversion fails' )

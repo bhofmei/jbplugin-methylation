@@ -341,7 +341,7 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             var store = f.source;
             var id = f.get('source');
             var isMethylated;
-            var score = f.get(scoreType) || f.get('score');
+            var score = scoreType ? f.get(scoreType) : f.get('score');
             if (thisB.config.methylatedOption) {
               if (f.get('methylated') === undefined) {
                 isMethylated = thisB._getScoreInfo(score);

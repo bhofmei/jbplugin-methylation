@@ -1,6 +1,8 @@
 # Release Notes for Methylation Plugin
 
 ## [Unreleased]
+- FIXED error with canvas methylation not displaying
+- UPDATED allc to bigwig script to handle gzip allc files
 
 ## [v3.3.2] - 2018-07-10
 - ADDED dialog mode which opens dialog immediately after loading tracks

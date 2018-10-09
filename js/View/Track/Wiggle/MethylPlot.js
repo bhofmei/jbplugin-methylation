@@ -86,10 +86,10 @@ define('MethylationPlugin/View/Track/Wiggle/MethylPlot', [
             min_score: -1,
             style: {
               origin_color: 'gray',
-              cg_color: '#A36085',
-              chg_color: '#0072B2',
+              cg_color: '#0072B2',
+              chg_color: '#88C043',
               chh_color: '#CF8F00',
-              ch_color: '#88C043',
+              ch_color: '#A36085',
               '4mc_color': '#5ABFA9',
               '5hmc_color': '#990623',
               '6ma_color': '#936EE7'

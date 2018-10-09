@@ -1,6 +1,6 @@
 {
-    "name": "jbplugin-methylation",
-    "version": "3.3.2",
+    "name": "methylation-jbrowse-plugin",
+    "version": "3.3.2f",
     "description": "JBrowse plugin for viewing DNA methylation",
     "main": "js/main.js",
     "scripts": {
@@ -31,5 +31,8 @@
     "devDependencies": {
         "jasmine": "^2.7.0",
         "jbrowse": "git+https://github.com/bhofmei/jbrowse"
-    }
+    },
+  "jbrowsePlugin":{
+    "name": "MethylationPlugin"
+  }
 }
